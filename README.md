@@ -49,6 +49,11 @@ CivicPulse is an AI-powered civic-demand and public-investment decision intellig
 - Tests can be run via: `pytest tests/`
 - Alembic migrations: `docker compose exec api alembic revision --autogenerate -m "..."`
 
+## Frontends
+The frontends are built with Next.js and are structured as separate dashboards:
+- `citizen-dashboard/`: The Citizen-Facing Experience for reporting and tracking issues.
+- `government-dashboard/`: The Government-Facing Experience (to be built).
+
 ## Team Sync (Frontend & Database)
 When syncing with the other teams managing the **Frontend** and **Database**:
 1. Duplicate `.env.prod.example` as `.env`.
