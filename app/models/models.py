@@ -153,7 +153,7 @@ class DocumentChunk(Base):
     page = Column(Integer)
     section = Column(String)
     text = Column(Text)
-    embedding = Column(Vector(384)) # Using 384 for generic embeddings like BGE-M3 or standard SentenceTransformers
+    embedding = Column(Vector(768)) # Using 768 for Google Gemini text-embedding-004
     retrieval_tags = Column(JSONB)
 
 class AuditEvent(Base):
