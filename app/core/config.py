@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     DUPLICATE_THRESHOLD: float = float(os.getenv("DUPLICATE_THRESHOLD", "0.75"))
     
     # Frontend sync
-    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost", "http://localhost:3000", "http://localhost:8080", "https://civicpulse.com"]
+    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "https://civicpulse.com"]
     
     class Config:
         case_sensitive = True
