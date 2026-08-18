@@ -28,14 +28,14 @@ class RequestPipeline:
         req.language = "en" # Still mocked
         req.pii_redacted_text = req.original_text.replace("12345", "[REDACTED]") 
         
-        # Step 2: Intent & Category Classification
-        from app.ai.classification.transformer_classifier import classify_text_real
-        classification = classify_text_real(req.pii_redacted_text)
-        req.category = classification['category']
-        req.intent = classification['intent']
-        req.severity = classification['severity']
-        req.urgency = classification['urgency']
-        req.ai_confidence = classification['confidence']
+        # Step 2: Intent & Category Classification via Gemini
+        from app.ai.classification.gemini_adapter import classify_with_gemini
+        classification = classify_with_gemini(req.pii_redacted_text)
+        req.category = classification.get('category', 'other')
+        req.intent = classification.get('intent', 'unknown')
+        req.severity = classification.get('severity', 'medium')
+        req.urgency = classification.get('urgency', 3)
+        req.ai_confidence = classification.get('confidence', 0.8)
         
         # Step 3: Entity Extraction
         entities = extract_entities(req.pii_redacted_text)
