@@ -13,12 +13,17 @@ def create_request(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
+    location_wkt = None
+    if request.longitude is not None and request.latitude is not None:
+        location_wkt = f"SRID=4326;POINT({request.longitude} {request.latitude})"
+
     new_request = CitizenRequest(
         original_text=request.text,
         country_code=request.country_code,
         source_channel=request.source_channel,
         language=request.language,
         consent_status=request.consent,
+        location=location_wkt,
         status="pending"
     )
     db.add(new_request)
