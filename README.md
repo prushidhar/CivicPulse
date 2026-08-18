@@ -48,3 +48,14 @@ CivicPulse is an AI-powered civic-demand and public-investment decision intellig
 ## Development
 - Tests can be run via: `pytest tests/`
 - Alembic migrations: `docker compose exec api alembic revision --autogenerate -m "..."`
+
+## Team Sync (Frontend & Database)
+When syncing with the other teams managing the **Frontend** and **Database**:
+1. Duplicate `.env.prod.example` as `.env`.
+2. Fill in the `FRONTEND_URL` (this sets the backend's CORS policies to allow their requests).
+3. Fill in the `DATABASE_URL` and `REDIS_URL` endpoints provided by the DB team.
+4. Run the decoupled stack:
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d --build
+   ```
+This drops the local Postgres/Redis/MinIO services and forces the API and Worker to point strictly to the external managed sources.
