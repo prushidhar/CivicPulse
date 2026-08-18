@@ -24,11 +24,12 @@ class RequestPipeline:
         self.db.commit()
 
         # Step 1: Language Detection & PII Redaction
-        req.language = "en" # Mock
-        req.pii_redacted_text = req.original_text.replace("12345", "[REDACTED]") # Mock
+        req.language = "en" # Still mocked
+        req.pii_redacted_text = req.original_text.replace("12345", "[REDACTED]") 
         
         # Step 2: Intent & Category Classification
-        classification = classify_text(req.pii_redacted_text)
+        from app.ai.classification.transformer_classifier import classify_text_real
+        classification = classify_text_real(req.pii_redacted_text)
         req.category = classification['category']
         req.intent = classification['intent']
         req.severity = classification['severity']
@@ -60,7 +61,13 @@ class RequestPipeline:
         score_data = calculate_priority(self.db, cluster_id)
         
         # Step 8: Feasibility Gates & Recommendation
-        generate_recommendation(self.db, cluster_id, score_data)
+        rec = generate_recommendation(self.db, cluster_id, score_data)
+        if rec:
+            from app.services.rag_service import RAGService
+            rag = RAGService(self.db)
+            query = f"{req.category} issues in {req.admin_level_2 or 'area'}"
+            evidence = rag.attach_evidence_to_recommendation(str(rec.recommendation_id), query)
+            rec.evidence = {"components": score_data['components'], "rag_evidence": evidence}
         
         req.status = "processed"
         self.db.commit()
