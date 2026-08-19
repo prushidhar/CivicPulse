@@ -9,12 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#1d4ed8",
-        secondary: "#9333ea",
+        primary: "#1c2a38", // Deep authoritative slate/blue
+        secondary: "#e06c4f", // Warm terracotta accent
+        background: "#f7f5f2", // Warm off-white
+        surface: "#ffffff",
         success: "#16a34a",
         warning: "#eab308",
         danger: "#dc2626",
       },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+      },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      }
     },
   },
   plugins: [],
