@@ -3,11 +3,33 @@ import { api, type Hotspot } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
 
 export default function CitizenRequests() {
-  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
+  const [hotspots, setHotspots] = useState<Hotspot[] | null>(null);
+
+  const fetchRequests = () => {
+    api.getHotspots().then(setHotspots);
+  };
 
   useEffect(() => {
-    api.getHotspots().then(setHotspots);
+    fetchRequests();
+    const interval = setInterval(fetchRequests, 10000);
+    return () => clearInterval(interval);
   }, []);
+
+  if (!hotspots) {
+    return (
+      <div className="p-6 space-y-6 animate-pulse">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-muted rounded w-1/3"></div>
+          <div className="h-10 bg-muted rounded w-64"></div>
+        </div>
+        <div className="border border-border rounded-lg bg-background p-4 space-y-4">
+          <div className="h-10 bg-muted-foreground/10 rounded w-full"></div>
+          <div className="h-12 bg-muted-foreground/10 rounded w-full"></div>
+          <div className="h-12 bg-muted-foreground/10 rounded w-full"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">

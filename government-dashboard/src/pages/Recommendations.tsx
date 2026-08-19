@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 
 export default function Recommendations() {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[] | null>(null);
   const [selectedRec, setSelectedRec] = useState<Recommendation | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [decisionReason, setDecisionReason] = useState('');
@@ -36,6 +36,30 @@ export default function Recommendations() {
     const newSelected = updated.find(r => r.id === selectedRec.id);
     if (newSelected) setSelectedRec(newSelected);
   };
+
+  if (!recommendations) {
+    return (
+      <div className="flex h-full w-full animate-pulse">
+        <div className="w-1/3 border-r border-border bg-muted/20 p-6 space-y-4">
+          <div className="h-6 bg-muted-foreground/20 rounded w-1/2 mb-8"></div>
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-24 bg-muted-foreground/10 rounded-lg w-full"></div>
+          ))}
+        </div>
+        <div className="flex-1 bg-background p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="h-10 bg-muted-foreground/20 rounded w-2/3"></div>
+            <div className="h-4 bg-muted-foreground/10 rounded w-full"></div>
+            <div className="h-4 bg-muted-foreground/10 rounded w-4/5"></div>
+            <div className="grid grid-cols-2 gap-6 mt-8">
+              <div className="h-64 bg-muted-foreground/10 rounded-xl"></div>
+              <div className="h-64 bg-muted-foreground/10 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full">

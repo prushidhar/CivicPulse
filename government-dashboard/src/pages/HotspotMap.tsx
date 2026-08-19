@@ -5,24 +5,45 @@ import { api, type Hotspot } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Layers } from 'lucide-react';
+import { cellToBoundary } from 'h3-js';
 
 export default function HotspotMap() {
-  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
+  const [hotspots, setHotspots] = useState<Hotspot[] | null>(null);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   
   // Layer toggles
   const [showDensity, setShowDensity] = useState(true);
   const [showVulnerability, setShowVulnerability] = useState(false);
 
-  useEffect(() => {
+  const fetchHotspots = () => {
     api.getHotspots().then(setHotspots);
+  };
+
+  useEffect(() => {
+    fetchHotspots();
+    const interval = setInterval(fetchHotspots, 10000);
+    return () => clearInterval(interval);
   }, []);
+
+  if (!hotspots) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-muted/20 animate-pulse">
+        <div className="text-muted-foreground flex flex-col items-center">
+          <div className="w-12 h-12 rounded-full border-4 border-muted-foreground/20 border-t-primary animate-spin mb-4"></div>
+          <p className="font-medium text-lg">Loading Live Hotspot Data...</p>
+        </div>
+      </div>
+    );
+  }
 
   const geoJsonData = {
     type: 'FeatureCollection',
     features: hotspots.map(h => ({
       type: 'Feature',
-      geometry: { type: 'Point', coordinates: [h.lon, h.lat] },
+      geometry: { 
+        type: 'Polygon', 
+        coordinates: [cellToBoundary(h.h3Index, true)] 
+      },
       properties: { ...h }
     }))
   };
@@ -43,11 +64,10 @@ export default function HotspotMap() {
           
           <Source id="hotspots" type="geojson" data={geoJsonData as any}>
             <Layer
-              id="hotspot-points"
-              type="circle"
+              id="hotspot-polygons"
+              type="fill"
               paint={{
-                'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 8, 15, 20],
-                'circle-color': [
+                'fill-color': [
                   'match',
                   ['get', 'severity'],
                   'high', '#ef4444',
@@ -55,9 +75,8 @@ export default function HotspotMap() {
                   'low', '#22c55e',
                   '#ccc'
                 ],
-                'circle-opacity': 0.8,
-                'circle-stroke-width': 2,
-                'circle-stroke-color': '#ffffff'
+                'fill-opacity': 0.6,
+                'fill-outline-color': '#ffffff'
               }}
             />
           </Source>
@@ -94,7 +113,6 @@ export default function HotspotMap() {
         </div>
         
         <div className="p-4 flex-1">
-          {/* For demo, we just show the first hotspot if none selected, or a prompt */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">

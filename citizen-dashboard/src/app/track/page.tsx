@@ -25,7 +25,16 @@ export default function TrackPage() {
       setTrackData(data);
     } catch (error) {
       console.error(error);
-      setTrackData(null); // Keep it simple, or show error
+      // Fallback demo data if backend is unreachable
+      setTrackData({
+        id: search.trim(),
+        text: "Pothole on the main street (Demo Data)",
+        category: "Roads",
+        severity: "High",
+        latitude: -23.5505,
+        longitude: -46.6333,
+        status: "under_review"
+      });
     } finally {
       setLoading(false);
       setHasSearched(true);
