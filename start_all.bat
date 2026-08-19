@@ -1,0 +1,13 @@
+@echo off
+echo Starting all CivicPulse servers...
+
+echo Starting Backend Server...
+start cmd /k "venv\Scripts\activate.bat && uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
+
+echo Starting Citizen Dashboard (localhost:3000)...
+start cmd /k "cd citizen-dashboard && npm run dev"
+
+echo Starting Government Dashboard (localhost:5173)...
+start cmd /k "cd government-dashboard && npm run dev"
+
+echo All servers have been launched in separate windows!

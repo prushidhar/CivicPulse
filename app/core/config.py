@@ -1,5 +1,5 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "CivicPulse BRICS"
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Frontend sync
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "https://civicpulse.com"]
     
-    class Config:
-        case_sensitive = True
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
 
 settings = Settings()
+
