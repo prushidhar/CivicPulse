@@ -11,6 +11,9 @@ export default function ReportPage() {
   const [progress, setProgress] = useState(0);
   const [aiResult, setAiResult] = useState<any>(null);
   const [text, setText] = useState("");
+  const [category, setCategory] = useState("");
+  const [severity, setSeverity] = useState("Low");
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +31,10 @@ export default function ReportPage() {
             language: "auto",
             consent: true,
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
+            category: category || undefined,
+            urgency: severity,
+            contact_email: email || undefined
           };
 
           try {
@@ -53,10 +59,10 @@ export default function ReportPage() {
             // Fallback for demo purposes if backend isn't running locally
             setProgress(100);
             setAiResult({
-              language: "English",
-              category: "Roads",
-              severity: "High",
-              confidence: "92%",
+              language: "Auto",
+              category: category || "General",
+              severity: severity,
+              confidence: "90%",
               location: "Lat: " + position.coords.latitude.toFixed(2) + ", Lng: " + position.coords.longitude.toFixed(2)
             });
             setTimeout(() => setStep("success"), 500);
@@ -180,7 +186,11 @@ export default function ReportPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">{t("category")}</label>
-            <select className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary">
+            <select 
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary"
+            >
               <option value="">Select a category (Optional)</option>
               <option value="Water">Water</option>
               <option value="Roads">Roads</option>
@@ -198,7 +208,11 @@ export default function ReportPage() {
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">{t("severity")}</label>
-            <select className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary">
+            <select 
+              value={severity}
+              onChange={(e) => setSeverity(e.target.value)}
+              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary"
+            >
               <option value="Low">Low - Not urgent</option>
               <option value="Medium">Medium - Needs attention soon</option>
               <option value="High">High - Urgent / Dangerous</option>
@@ -216,7 +230,13 @@ export default function ReportPage() {
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">{t("contactEmail")}</label>
-            <input type="email" placeholder="email@example.com" className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary" />
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@example.com" 
+              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary" 
+            />
           </div>
         </div>
 

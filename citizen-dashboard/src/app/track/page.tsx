@@ -8,10 +8,26 @@ export default function TrackPage() {
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [trackData, setTrackData] = useState<any>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (search.trim()) {
+    if (!search.trim()) return;
+    
+    setLoading(true);
+    setHasSearched(false);
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests/${search.trim()}`);
+      if (!response.ok) throw new Error("Not found");
+      const data = await response.json();
+      setTrackData(data);
+    } catch (error) {
+      console.error(error);
+      setTrackData(null); // Keep it simple, or show error
+    } finally {
+      setLoading(false);
       setHasSearched(true);
     }
   };
@@ -54,7 +70,13 @@ export default function TrackPage() {
         </form>
       </div>
 
-      {hasSearched && (
+      {hasSearched && !trackData && !loading && (
+        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border text-center text-red-500 font-medium">
+          Request not found. Please check the ID and try again.
+        </div>
+      )}
+
+      {hasSearched && trackData && !loading && (
         <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border space-y-8 animate-in fade-in slide-in-from-bottom-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
             <div>
@@ -71,24 +93,24 @@ export default function TrackPage() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t("problemSummary")}</h3>
                 <p className="text-gray-800 font-medium bg-gray-50 p-4 rounded-xl border">
-                  Large pothole on the main street causing traffic delays and vehicle damage.
+                  {trackData?.text || trackData?.description || "Loading description..."}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Category</h3>
-                  <p className="font-semibold text-gray-800">Roads</p>
+                  <p className="font-semibold text-gray-800">{trackData?.category || "N/A"}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Severity</h3>
-                  <p className="font-semibold text-red-600">High</p>
+                  <p className="font-semibold text-red-600">{trackData?.urgency || trackData?.severity || "N/A"}</p>
                 </div>
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Location (Public View)</h3>
                 <div className="flex items-start gap-2 text-gray-600 bg-gray-50 p-4 rounded-xl border">
                   <MapPin className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
-                  <p>Downtown Area <span className="block text-xs text-gray-400 mt-1">Precise location hidden for privacy</span></p>
+                  <p>Lat: {trackData?.latitude ? trackData.latitude.toFixed(2) : "..."} Lng: {trackData?.longitude ? trackData.longitude.toFixed(2) : "..."} <span className="block text-xs text-gray-400 mt-1">Precise location hidden for privacy</span></p>
                 </div>
               </div>
             </div>
