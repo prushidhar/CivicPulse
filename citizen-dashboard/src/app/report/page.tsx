@@ -182,21 +182,21 @@ export default function ReportPage() {
 
   if (step === "processing") {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 flex flex-col items-center justify-center space-y-8 text-center">
+      <div className="max-w-2xl mx-auto py-20 px-4 flex flex-col items-center justify-center space-y-8 text-center animate-in fade-in zoom-in-95">
         <Loader2 className="w-16 h-16 text-primary animate-spin" />
-        <h2 className="text-2xl font-bold">Processing Your Request</h2>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+        <h2 className="text-3xl font-extrabold text-primary">Processing Your Request</h2>
+        <div className="w-full bg-primary/10 rounded-full h-3">
+          <div className="bg-primary h-3 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
         </div>
-        <div className="flex flex-col gap-2 text-sm text-gray-600 font-medium w-full max-w-sm text-left">
-          <div className={`flex items-center gap-2 ${progress >= 30 ? "text-primary" : "text-gray-400"}`}>
-            <CheckCircle2 className="w-4 h-4" /> Request Submitted
+        <div className="flex flex-col gap-4 text-sm font-bold w-full max-w-sm text-left">
+          <div className={`flex items-center gap-3 ${progress >= 30 ? "text-primary" : "text-primary/30"}`}>
+            <CheckCircle2 className="w-5 h-5" /> Request Submitted
           </div>
-          <div className={`flex items-center gap-2 ${progress >= 60 ? "text-primary" : "text-gray-400"}`}>
-            <CheckCircle2 className="w-4 h-4" /> Saving Data
+          <div className={`flex items-center gap-3 ${progress >= 60 ? "text-primary" : "text-primary/30"}`}>
+            <CheckCircle2 className="w-5 h-5" /> Saving Data
           </div>
-          <div className={`flex items-center gap-2 ${progress >= 100 ? "text-primary" : "text-gray-400"}`}>
-            <CheckCircle2 className="w-4 h-4" /> Finalizing
+          <div className={`flex items-center gap-3 ${progress >= 100 ? "text-primary" : "text-primary/30"}`}>
+            <CheckCircle2 className="w-5 h-5" /> Finalizing
           </div>
         </div>
       </div>
@@ -205,22 +205,24 @@ export default function ReportPage() {
 
   if (step === "success" && aiResult) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4">
-        <div className="bg-white border rounded-2xl p-8 shadow-sm text-center space-y-6">
-          <div className="mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+      <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4">
+        <div className="bg-surface p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-8">
+          <div className="mx-auto w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-4">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Request Registered Successfully</h2>
-          <p className="text-gray-600">Your tracking reference is: <strong className="text-black bg-gray-100 px-2 py-1 rounded">{aiResult.request_id}</strong></p>
+          <div className="space-y-3">
+            <h2 className="text-3xl font-extrabold text-primary">Report Registered</h2>
+            <p className="text-primary/60 font-medium text-lg">Your tracking reference is: <strong className="text-primary bg-background px-3 py-1.5 rounded-xl border border-gray-200">{aiResult.request_id}</strong></p>
+          </div>
           
-          <div className="bg-blue-50 p-4 rounded-xl text-left text-sm text-blue-900 grid grid-cols-2 gap-4">
-            <div><span className="opacity-75 block">{t("category")}</span> <span className="font-semibold">{aiResult.category}</span></div>
-            <div><span className="opacity-75 block">{t("severity")}</span> <span className="font-semibold text-red-600">{aiResult.severity}</span></div>
-            <div className="col-span-2"><span className="opacity-75 block">Location Summary</span> <span className="font-semibold">{aiResult.location}</span></div>
+          <div className="bg-background p-6 rounded-3xl text-left text-sm text-primary grid grid-cols-2 gap-6 border border-gray-100">
+            <div className="space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">{t("category")}</span> <span className="font-bold text-lg">{aiResult.category}</span></div>
+            <div className="space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">{t("severity")}</span> <span className="font-bold text-secondary text-lg">{aiResult.severity}</span></div>
+            <div className="col-span-2 space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">Location Summary</span> <span className="font-bold text-lg">{aiResult.location}</span></div>
           </div>
 
-          <Link href="/track" className="inline-flex items-center justify-center gap-2 w-full py-3 bg-primary text-white rounded-xl font-medium hover:bg-blue-700 transition">
-            {t("trackBtn")} <ArrowRight className="w-4 h-4" />
+          <Link href="/track" className="inline-flex items-center justify-center gap-3 w-full py-5 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md">
+            {t("trackBtn")} <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </div>
@@ -228,38 +230,39 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("reportTitle")}</h1>
-        <p className="text-gray-600">{t("reportDesc")}</p>
+    <div className="max-w-3xl mx-auto mt-8 space-y-10 mb-20">
+      <div className="space-y-4">
+        <h1 className="text-4xl font-extrabold text-primary tracking-tight">{t("reportTitle")}</h1>
+        <p className="text-xl text-primary/60 font-medium">{t("reportDesc")}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border">
+      <form onSubmit={handleSubmit} className="space-y-10">
+        
         {/* Input Modes */}
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">{t("describeIssue")}</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
+          <label className="block text-lg font-bold text-primary">{t("describeIssue")}</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <textarea 
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="w-full p-4 border rounded-xl resize-none focus:ring-2 focus:ring-primary outline-none h-32"
+              className="w-full p-6 bg-background border-none rounded-[2rem] resize-none focus:ring-2 focus:ring-primary/20 outline-none h-40 text-primary font-medium placeholder:text-primary/40"
               placeholder={t("describePlaceholder")}
             ></textarea>
-            <div className="flex flex-col gap-2 h-32">
+            <div className="flex flex-col gap-4 h-40">
               <div 
                 onClick={toggleRecording}
-                className={`flex-1 border-2 border-dashed rounded-xl flex items-center justify-center gap-3 cursor-pointer transition ${recording ? 'border-red-500 bg-red-50 text-red-600' : audioBlob ? 'border-green-500 bg-green-50 text-green-600' : 'border-gray-300 hover:bg-gray-50 text-gray-500'}`}
+                className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition border ${recording ? 'border-secondary bg-secondary/5 text-secondary' : audioBlob ? 'border-success bg-success/5 text-success' : 'border-gray-200 bg-surface hover:bg-background text-primary/60'}`}
               >
                 {recording ? (
-                  <Square className="w-6 h-6 text-red-500 fill-red-500 animate-pulse" />
+                  <Square className="w-6 h-6 text-secondary fill-secondary animate-pulse" />
                 ) : (
-                  <Mic className={`w-6 h-6 ${audioBlob ? 'text-green-500' : 'text-primary'}`} />
+                  <Mic className={`w-6 h-6 ${audioBlob ? 'text-success' : 'text-primary/40'}`} />
                 )}
-                <span className="text-sm font-medium">
-                  {recording ? "Recording... Tap to stop" : audioBlob ? "Audio recorded! Tap to rerecord" : t("tapRecord")}
+                <span className="font-bold">
+                  {recording ? "Recording..." : audioBlob ? "Recorded!" : t("tapRecord")}
                 </span>
               </div>
-              <label className={`flex-1 border-2 border-dashed rounded-xl flex items-center justify-center gap-3 cursor-pointer transition ${uploadedFile ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-300 hover:bg-gray-50 text-gray-500'}`}>
+              <label className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition border ${uploadedFile ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-surface hover:bg-background text-primary/60'}`}>
                 <input 
                   type="file" 
                   className="hidden" 
@@ -270,40 +273,40 @@ export default function ReportPage() {
                     }
                   }} 
                 />
-                <span className="text-sm font-medium">
-                  {uploadedFile ? `Attached: ${uploadedFile.name}` : t("orUpload")}
+                <span className="font-bold truncate px-4">
+                  {uploadedFile ? uploadedFile.name : t("orUpload")}
                 </span>
               </label>
             </div>
           </div>
         </div>
 
-        {/* Location Input with MapLibre */}
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">{t("location")}</label>
-          <div className="flex gap-2">
-            <button type="button" onClick={handleUseMyLocation} className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl flex items-center gap-2 hover:bg-gray-200 transition font-medium">
-              <MapPin className="w-5 h-5" /> {t("useMyLocation")}
+        {/* Location Input */}
+        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
+          <div className="flex justify-between items-center">
+            <label className="block text-lg font-bold text-primary">{t("location")}</label>
+            <button type="button" onClick={handleUseMyLocation} className="px-5 py-3 bg-background text-primary rounded-2xl flex items-center gap-2 hover:bg-primary/5 transition font-bold text-sm">
+              <MapPin className="w-4 h-4" /> {t("useMyLocation")}
             </button>
-            <div className="flex-1 p-3 border rounded-xl bg-gray-50 text-gray-500 flex items-center">
-              {mapLat.toFixed(4)}, {mapLng.toFixed(4)}
-            </div>
           </div>
-          <div ref={mapContainerRef} className="w-full h-64 bg-gray-200 rounded-xl border overflow-hidden relative">
-            {/* MapLibre will inject canvas here */}
+          <div className="w-full h-[300px] bg-background rounded-[2rem] overflow-hidden relative border border-gray-100/50">
+            <div ref={mapContainerRef} className="absolute inset-0"></div>
+          </div>
+          <div className="text-center text-primary/50 font-bold text-sm bg-background py-3 rounded-2xl border border-gray-100">
+             Lat: {mapLat.toFixed(4)} | Lng: {mapLng.toFixed(4)}
           </div>
         </div>
 
         {/* Categorization & Urgency */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">{t("category")}</label>
+          <div className="bg-surface p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-4">
+            <label className="block text-lg font-bold text-primary">{t("category")}</label>
             <select 
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold appearance-none cursor-pointer"
             >
-              <option value="">Select a category (Optional)</option>
+              <option value="">Auto-detect category</option>
               <option value="Water">Water</option>
               <option value="Roads">Roads</option>
               <option value="Health">Health</option>
@@ -318,41 +321,41 @@ export default function ReportPage() {
               <option value="Other">Other</option>
             </select>
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">{t("severity")}</label>
+          <div className="bg-surface p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-4">
+            <label className="block text-lg font-bold text-primary">{t("severity")}</label>
             <select 
               value={severity}
               onChange={(e) => setSeverity(e.target.value)}
-              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold appearance-none cursor-pointer"
             >
               <option value="Low">Low - Not urgent</option>
-              <option value="Medium">Medium - Needs attention soon</option>
+              <option value="Medium">Medium - Needs attention</option>
               <option value="High">High - Urgent / Dangerous</option>
             </select>
           </div>
         </div>
 
         {/* Privacy & Consent */}
-        <div className="space-y-4 pt-4 border-t">
-          <div className="flex items-start gap-3">
-            <input type="checkbox" id="consent" required className="mt-1 w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" />
-            <label htmlFor="consent" className="text-sm text-gray-600">
-              {t("consentLabel")}
-            </label>
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">{t("contactEmail")}</label>
+        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-8">
+          <div className="space-y-4">
+            <label className="block text-lg font-bold text-primary">{t("contactEmail")}</label>
             <input 
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@example.com" 
-              className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-primary" 
+              className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
             />
+          </div>
+          <div className="flex items-start gap-4">
+            <input type="checkbox" id="consent" required className="mt-1.5 w-5 h-5 text-primary rounded-md border-gray-300 focus:ring-primary cursor-pointer" />
+            <label htmlFor="consent" className="text-primary/60 font-medium leading-relaxed cursor-pointer">
+              {t("consentLabel")}
+            </label>
           </div>
         </div>
 
-        <button type="submit" className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow flex items-center justify-center gap-2">
+        <button type="submit" className="w-full py-6 bg-primary text-white rounded-[2rem] font-extrabold text-xl hover:bg-primary/90 transition shadow-lg flex items-center justify-center gap-3">
           {t("submitRequest")}
         </button>
       </form>
