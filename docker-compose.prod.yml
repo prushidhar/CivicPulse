@@ -1,0 +1,35 @@
+version: '3.8'
+
+# Use this file when the Database and Frontend teams provide their endpoints.
+# Run with: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # These must be set in your host environment or .env file to sync with the other teams
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - DEMO_MODE=False
+      # Allow the frontend application to access this API
+      - BACKEND_CORS_ORIGINS=["${FRONTEND_URL}"]
+
+  worker:
+    build: .
+    command: celery -A app.workers.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - DEMO_MODE=False
+
+# Note: PostgreSQL (DB), Redis, and MinIO services are removed here.
+# This architecture assumes those are fully managed by the DB team 
+# (e.g. AWS RDS PostGIS/pgvector, ElastiCache, AWS S3).
