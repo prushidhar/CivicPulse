@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { api, type Hotspot } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
 
 export default function CitizenRequests() {
-  const [hotspots, setHotspots] = useState<Hotspot[] | null>(null);
+  const [requests, setRequests] = useState<any[] | null>(null);
 
   const fetchRequests = () => {
-    api.getHotspots().then(setHotspots);
+    // We added getRequests to api.ts so we fetch the raw individual reports
+    api.getRequests().then(data => {
+      // The API returns an array, or an object with an items array depending on pagination
+      if (Array.isArray(data)) {
+        setRequests(data);
+      } else if (data && data.items) {
+        setRequests(data.items);
+      } else {
+        setRequests([]);
+      }
+    }).catch(() => setRequests([]));
   };
 
   useEffect(() => {
@@ -15,7 +25,7 @@ export default function CitizenRequests() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!hotspots) {
+  if (!requests) {
     return (
       <div className="p-6 space-y-6 animate-pulse">
         <div className="flex justify-between items-center">
@@ -34,7 +44,7 @@ export default function CitizenRequests() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Citizen Requests & Incidents</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Citizen Reports (Live Data)</h1>
         <div className="flex space-x-2">
           <input 
             type="text" 
@@ -49,28 +59,35 @@ export default function CitizenRequests() {
           <thead className="text-xs text-muted-foreground bg-muted/50 border-b border-border uppercase">
             <tr>
               <th className="px-6 py-3 font-medium">Request ID</th>
-              <th className="px-6 py-3 font-medium">H3 Grid Index</th>
-              <th className="px-6 py-3 font-medium">Volume</th>
+              <th className="px-6 py-3 font-medium">Category</th>
+              <th className="px-6 py-3 font-medium">Description</th>
               <th className="px-6 py-3 font-medium">Severity</th>
               <th className="px-6 py-3 font-medium">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {hotspots.map((h, i) => (
-              <tr key={h.id} className="hover:bg-muted/50 transition-colors">
-                <td className="px-6 py-4 font-medium text-foreground">{h.id}</td>
-                <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{h.h3Index}</td>
-                <td className="px-6 py-4">{h.requestCount} reports</td>
+            {requests.map((r, i) => (
+              <tr key={r.request_id || i} className="hover:bg-muted/50 transition-colors">
+                <td className="px-6 py-4 font-medium text-foreground">{r.request_id?.split('-')[0]}...</td>
+                <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{r.category || 'N/A'}</td>
+                <td className="px-6 py-4 truncate max-w-xs" title={r.original_text || r.description}>{r.original_text || r.description}</td>
                 <td className="px-6 py-4">
-                  <Badge variant={h.severity === 'high' ? 'destructive' : h.severity === 'medium' ? 'warning' : 'success'}>
-                    {h.severity.toUpperCase()}
+                  <Badge variant={r.severity === 'high' ? 'destructive' : r.severity === 'medium' ? 'warning' : 'success'}>
+                    {(r.severity || 'low').toUpperCase()}
                   </Badge>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-muted-foreground text-xs">Pending Review</span>
+                  <span className="text-muted-foreground text-xs uppercase">{r.status || 'Pending'}</span>
                 </td>
               </tr>
             ))}
+            {requests.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                  No live citizen requests found in the database.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
