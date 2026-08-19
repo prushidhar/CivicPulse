@@ -20,21 +20,13 @@ export default function TrackPage() {
     
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests/${search.trim()}`);
-      if (!response.ok) throw new Error("Not found");
+      if (!response.ok) throw new Error("Request not found in database");
       const data = await response.json();
       setTrackData(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      // Fallback demo data if backend is unreachable
-      setTrackData({
-        id: search.trim(),
-        text: "Pothole on the main street (Demo Data)",
-        category: "Roads",
-        severity: "High",
-        latitude: -23.5505,
-        longitude: -46.6333,
-        status: "under_review"
-      });
+      setTrackData(null);
+      alert("Error: Could not find that request ID. Make sure you submit a real report first!");
     } finally {
       setLoading(false);
       setHasSearched(true);
