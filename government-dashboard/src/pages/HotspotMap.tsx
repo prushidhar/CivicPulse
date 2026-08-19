@@ -22,7 +22,7 @@ export default function HotspotMap() {
     type: 'FeatureCollection',
     features: hotspots.map(h => ({
       type: 'Feature',
-      geometry: { type: 'Point', coordinates: h.coordinates },
+      geometry: { type: 'Point', coordinates: [h.lon, h.lat] },
       properties: { ...h }
     }))
   };

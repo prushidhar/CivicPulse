@@ -1,4 +1,27 @@
-// Mock API Client for CivicPulse BRICS
+// API Client for CivicPulse BRICS
+
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+
+export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+  const token = localStorage.getItem("token"); // Or however you store the JWT
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return response.json();
+}
 
 export type Hotspot = {
   id: string;
@@ -6,7 +29,8 @@ export type Hotspot = {
   severity: 'high' | 'medium' | 'low';
   requestCount: number;
   populationDensity: number;
-  coordinates: [number, number];
+  lat: number;
+  lon: number;
 };
 
 export type Recommendation = {
@@ -45,142 +69,51 @@ export type AuditLog = {
   details: string;
 };
 
-const MOCK_H3_INDICES = ['8a2a1072b59ffff', '8a2a1072b58ffff', '8a2a1072b5affff', '8a2a1072b5bffff'];
-
-// Synthetic Data Stores (in-memory)
-let recommendations: Recommendation[] = [
-  {
-    id: 'REC-001',
-    hotspotId: 'HS-1',
-    priorityScore: 88,
-    title: 'Emergency Water Supply Intervention',
-    description: 'High volume of citizen requests indicating severe water shortage in Sector 4.',
-    status: 'pending',
-    scores: {
-      demandIntensity: 22,
-      infrastructureGap: 18,
-      vulnerability: 14,
-      affectedPopulation: 8,
-      urgencyRisk: 9,
-      trendAcceleration: 9,
-      feasibility: 4,
-      equityAdjustment: 4,
-    }
-  },
-  {
-    id: 'REC-002',
-    hotspotId: 'HS-2',
-    priorityScore: 75,
-    title: 'Road Surface Repair',
-    description: 'Multiple reports of deep potholes causing traffic disruption and vehicle damage.',
-    status: 'pending',
-    scores: {
-      demandIntensity: 18,
-      infrastructureGap: 15,
-      vulnerability: 10,
-      affectedPopulation: 8,
-      urgencyRisk: 7,
-      trendAcceleration: 8,
-      feasibility: 5,
-      equityAdjustment: 4,
-    }
-  }
-];
-
-let auditLogs: AuditLog[] = [
-  {
-    id: 'AUD-001',
-    objectId: 'REC-001',
-    action: 'SYSTEM_GENERATED',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    user: 'SYSTEM',
-    details: 'Recommendation generated based on 452 citizen requests.'
-  }
-];
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const api = {
   getHotspots: async (): Promise<Hotspot[]> => {
-    await delay(300);
-    return [
-      { id: 'HS-1', h3Index: MOCK_H3_INDICES[0], severity: 'high', requestCount: 452, populationDensity: 12000, coordinates: [-74.006, 40.7128] },
-      { id: 'HS-2', h3Index: MOCK_H3_INDICES[1], severity: 'medium', requestCount: 128, populationDensity: 8500, coordinates: [-73.985, 40.748] },
-      { id: 'HS-3', h3Index: MOCK_H3_INDICES[2], severity: 'low', requestCount: 45, populationDensity: 5000, coordinates: [-73.935, 40.730] },
-    ];
+    return fetchWithAuth('/hotspots');
   },
 
   getGeoUnit: async (id: string) => {
-    await delay(200);
-    return { id, name: `Sector ${id.split('-')[1]}`, areaSqKm: 12.5 };
+    return fetchWithAuth(`/geo/units/${id}`);
   },
 
   getIndicators: async () => {
-    await delay(200);
-    return { overallHealth: 78, citizenSatisfaction: 65, activeAlerts: 12 };
+    return fetchWithAuth('/indicators');
   },
 
   getInfrastructure: async () => {
-    await delay(400);
-    return [
-      { id: 'INF-1', type: 'Water Treatment', condition: 'Poor', capacityGauge: 45 },
-      { id: 'INF-2', type: 'Power Grid', condition: 'Good', capacityGauge: 85 },
-    ];
+    return fetchWithAuth('/infrastructure');
   },
 
   getProjects: async () => {
-    await delay(300);
-    return [
-      { id: 'PRJ-1', name: 'Sector 4 Water Pipe Upgrade', budget: 1500000, overlapWarning: true },
-    ];
+    return fetchWithAuth('/projects');
   },
 
   getRecommendations: async (): Promise<Recommendation[]> => {
-    await delay(500);
-    return [...recommendations];
+    return fetchWithAuth('/recommendations');
   },
 
   getEvidence: async (id: string): Promise<Evidence[]> => {
-    await delay(300);
-    return [
-      { id: 'EV-1', recommendationId: id, type: 'citizen_report', description: '452 unique reports of no water in 48h', confidence: 0.95 },
-      { id: 'EV-2', recommendationId: id, type: 'infrastructure_sensor', description: 'Pressure drop detected at Pump Station Alpha', confidence: 0.88 },
-    ];
+    return fetchWithAuth(`/recommendations/${id}/evidence`);
   },
 
   decideRecommendation: async (id: string, decision: 'accepted' | 'rejected' | 'edited', reason: string) => {
-    await delay(600);
-    const recIndex = recommendations.findIndex(r => r.id === id);
-    if (recIndex !== -1) {
-      recommendations[recIndex] = { ...recommendations[recIndex], status: decision };
-      auditLogs.unshift({
-        id: `AUD-${Date.now()}`,
-        objectId: id,
-        action: `DECISION_${decision.toUpperCase()}`,
-        timestamp: new Date().toISOString(),
-        user: 'Gov Reviewer',
-        details: reason
-      });
-      return recommendations[recIndex];
-    }
-    throw new Error('Recommendation not found');
+    return fetchWithAuth(`/recommendations/${id}/decision`, {
+      method: 'POST',
+      body: JSON.stringify({ decision, reason })
+    });
   },
 
   getImpact: async () => {
-    await delay(300);
-    return { estimatedPopulationReached: 45000, budgetEfficiency: 1.2 };
+    return fetchWithAuth('/impact');
   },
 
   getDatasets: async () => {
-    await delay(200);
-    return [
-      { id: 'DS-1', name: 'Citizen Reports Q3', source: 'CivicApp', records: 15000 },
-      { id: 'DS-2', name: 'IoT Sensor Data', source: 'InfraNet', records: 2000000 },
-    ];
+    return fetchWithAuth('/datasets');
   },
 
   getAudit: async (objectId: string): Promise<AuditLog[]> => {
-    await delay(300);
-    return auditLogs.filter(log => log.objectId === objectId);
+    return fetchWithAuth(`/audit/${objectId}`);
   }
 };
