@@ -27,6 +27,7 @@ export default function ReportPage() {
   // Audio recording states
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -139,14 +140,19 @@ export default function ReportPage() {
       
       const requestId = data.id || data.request_id || "REQ-" + Math.floor(Math.random() * 100000).toString();
 
-      if (audioBlob) {
+      if (audioBlob || uploadedFile) {
         const formData = new FormData();
-        formData.append("file", audioBlob, "recording.webm");
+        if (audioBlob) {
+          formData.append("file", audioBlob, "recording.webm");
+        } else if (uploadedFile) {
+          formData.append("file", uploadedFile);
+        }
+        
         // Don't await strictly if we want to show success fast, but it's safer to await
         await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests/${requestId}/media`, {
           method: "POST",
           body: formData
-        }).catch(err => console.error("Audio upload failed", err));
+        }).catch(err => console.error("Media upload failed", err));
       }
       
       setProgress(100);
@@ -239,18 +245,35 @@ export default function ReportPage() {
               className="w-full p-4 border rounded-xl resize-none focus:ring-2 focus:ring-primary outline-none h-32"
               placeholder={t("describePlaceholder")}
             ></textarea>
-            <div 
-              onClick={toggleRecording}
-              className={`border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer transition ${recording ? 'border-red-500 bg-red-50 text-red-600' : audioBlob ? 'border-green-500 bg-green-50 text-green-600' : 'border-gray-300 hover:bg-gray-50 text-gray-500'}`}
-            >
-              {recording ? (
-                <Square className="w-8 h-8 text-red-500 fill-red-500 animate-pulse" />
-              ) : (
-                <Mic className={`w-8 h-8 ${audioBlob ? 'text-green-500' : 'text-primary'}`} />
-              )}
-              <span className="text-sm font-medium">
-                {recording ? "Recording... Tap to stop" : audioBlob ? "Audio recorded! Tap to rerecord" : t("tapRecord")}
-              </span>
+            <div className="flex flex-col gap-2 h-32">
+              <div 
+                onClick={toggleRecording}
+                className={`flex-1 border-2 border-dashed rounded-xl flex items-center justify-center gap-3 cursor-pointer transition ${recording ? 'border-red-500 bg-red-50 text-red-600' : audioBlob ? 'border-green-500 bg-green-50 text-green-600' : 'border-gray-300 hover:bg-gray-50 text-gray-500'}`}
+              >
+                {recording ? (
+                  <Square className="w-6 h-6 text-red-500 fill-red-500 animate-pulse" />
+                ) : (
+                  <Mic className={`w-6 h-6 ${audioBlob ? 'text-green-500' : 'text-primary'}`} />
+                )}
+                <span className="text-sm font-medium">
+                  {recording ? "Recording... Tap to stop" : audioBlob ? "Audio recorded! Tap to rerecord" : t("tapRecord")}
+                </span>
+              </div>
+              <label className={`flex-1 border-2 border-dashed rounded-xl flex items-center justify-center gap-3 cursor-pointer transition ${uploadedFile ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-300 hover:bg-gray-50 text-gray-500'}`}>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*,video/*" 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setUploadedFile(e.target.files[0]);
+                    }
+                  }} 
+                />
+                <span className="text-sm font-medium">
+                  {uploadedFile ? `Attached: ${uploadedFile.name}` : t("orUpload")}
+                </span>
+              </label>
             </div>
           </div>
         </div>
