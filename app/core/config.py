@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     MINIO_SECRET_KEY: str = os.getenv("MINIO_SECRET_KEY", "password")
     MINIO_BUCKET: str = os.getenv("MINIO_BUCKET", "civicpulse-media")
     
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "supersecretjwtkeythatshouldbechangedinproduction")
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "super_secret_for_dev_only")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 1 week
     
-    DEMO_MODE: bool = os.getenv("DEMO_MODE", "True").lower() in ("true", "1", "yes")
+    DEMO_MODE: bool = os.getenv("DEMO_MODE", "False").lower() in ("true", "1", "yes")
     H3_RESOLUTION: int = int(os.getenv("H3_RESOLUTION", "9"))
     DUPLICATE_THRESHOLD: float = float(os.getenv("DUPLICATE_THRESHOLD", "0.75"))
     

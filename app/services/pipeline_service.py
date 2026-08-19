@@ -1,5 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.models.models import CitizenRequest
 from app.ai.classification.mock_classifier import classify_text
 from app.ai.ner.mock_ner import extract_entities
@@ -41,11 +42,27 @@ class RequestPipeline:
         req.entities = entities
         
         # Step 4: Geocoding & H3
-        geo_result = geocode_entities(entities, req.country_code)
-        if geo_result:
-            req.location = geo_result['point']
-            req.h3_cell = geo_result['h3']
-            req.geocoding_confidence = geo_result['confidence']
+        if req.location:
+            # We already have live GPS coordinates from the frontend
+            # The location is in WKT format: SRID=4326;POINT(lon lat)
+            # Just compute H3
+            import h3
+            wkt_str = str(req.location)
+            # naive parsing since it's known format
+            try:
+                coords = wkt_str.split("POINT(")[1].split(")")[0].split(" ")
+                lon, lat = float(coords[0]), float(coords[1])
+                req.h3_cell = h3.latlng_to_cell(lat, lon, settings.H3_RESOLUTION)
+                req.geocoding_confidence = 1.0 # 100% confidence for live GPS
+            except:
+                pass
+        else:
+            # Fallback to NER geocoding
+            geo_result = geocode_entities(entities, req.country_code)
+            if geo_result:
+                req.location = geo_result['point']
+                req.h3_cell = geo_result['h3']
+                req.geocoding_confidence = geo_result['confidence']
             
         self.db.commit()
         

@@ -9,6 +9,8 @@ class CitizenRequestCreate(BaseModel):
     source_channel: str = Field("web", description="Origin of request (web, mobile, sms, etc)")
     language: str = Field("auto", description="Language of text")
     consent: bool = Field(True, description="Citizen gave consent to process")
+    latitude: Optional[float] = Field(None, description="GPS Latitude")
+    longitude: Optional[float] = Field(None, description="GPS Longitude")
     
 class CitizenRequestResponse(BaseModel):
     request_id: UUID

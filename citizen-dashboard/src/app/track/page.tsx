@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Search, MapPin, Activity, CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { Search, MapPin, CheckCircle2, Circle } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function TrackPage() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -27,9 +29,9 @@ export default function TrackPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Track Your Request</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t("trackTitle")}</h1>
         <p className="text-gray-600 max-w-xl mx-auto">
-          Enter your reference number below to check the real-time status of your report.
+          {t("trackDesc")}
         </p>
       </div>
 
@@ -39,7 +41,7 @@ export default function TrackPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input 
               type="text" 
-              placeholder="e.g. REQ-8924B" 
+              placeholder={t("trackPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-4 border rounded-xl outline-none focus:ring-2 focus:ring-primary font-medium"
@@ -47,7 +49,7 @@ export default function TrackPage() {
             />
           </div>
           <button type="submit" className="px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-blue-700 transition">
-            Track
+            {t("track")}
           </button>
         </form>
       </div>
@@ -60,14 +62,14 @@ export default function TrackPage() {
               <p className="text-gray-500">Submitted on Aug 18, 2026</p>
             </div>
             <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full font-semibold text-sm">
-              Under Review
+              {t("underReview")}
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Problem Summary</h3>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t("problemSummary")}</h3>
                 <p className="text-gray-800 font-medium bg-gray-50 p-4 rounded-xl border">
                   Large pothole on the main street causing traffic delays and vehicle damage.
                 </p>
@@ -92,7 +94,7 @@ export default function TrackPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-6">Lifecycle Status</h3>
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-6">{t("lifecycleStatus")}</h3>
               <div className="space-y-6">
                 {steps.map((step, index) => (
                   <div key={index} className="flex gap-4 relative">
@@ -112,9 +114,6 @@ export default function TrackPage() {
                     </div>
                     <div>
                       <p className={`font-semibold ${step.status === 'upcoming' ? 'text-gray-400' : 'text-gray-900'}`}>{step.label}</p>
-                      {step.status === "current" && (
-                        <p className="text-sm text-primary mt-1">Currently being reviewed by city officials.</p>
-                      )}
                     </div>
                   </div>
                 ))}

@@ -76,7 +76,7 @@ export default function AuditConsole() {
         <h3 className="font-semibold mb-2 text-foreground">Dataset Provenance Graph</h3>
         <p className="text-sm mb-4">Visual representation of data sources contributing to {searchId}</p>
         <div className="inline-flex items-center justify-center p-4 bg-muted rounded-md text-xs">
-          [Citizen Reports Q3] ──> [Aggregation Pipeline] ──> [Priority Engine (REC-001)]
+          [Citizen Reports Q3] ──&gt; [Aggregation Pipeline] ──&gt; [Priority Engine (REC-001)]
         </div>
       </div>
     </div>
