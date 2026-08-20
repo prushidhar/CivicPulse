@@ -31,7 +31,13 @@ def create_request(
     db.commit()
     db.refresh(new_request)
     
-    process_citizen_request.delay(str(new_request.request_id))
+    # Run pipeline synchronously for Vercel/demo environment instead of Celery
+    try:
+        from app.services.pipeline_service import RequestPipeline
+        pipeline = RequestPipeline(db)
+        pipeline.run_full_pipeline(str(new_request.request_id))
+    except Exception as e:
+        print(f"Pipeline error: {e}")
     
     return CitizenRequestResponse(
         request_id=new_request.request_id,
@@ -59,10 +65,18 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     
     db_req.location = None
     setattr(db_req, "description", db_req.original_text)
+    
+    # If the background pipeline never ran, run it on-demand now!
     if not db_req.category:
-        db_req.category = "Processing..."
-    if not db_req.severity:
-        db_req.severity = "Pending"
+        try:
+            from app.services.pipeline_service import RequestPipeline
+            pipeline = RequestPipeline(db)
+            pipeline.run_full_pipeline(str(db_req.request_id))
+            db.refresh(db_req)
+        except Exception as e:
+            print(f"Pipeline error on demand: {e}")
+            db_req.category = "Processing..."
+            db_req.severity = "Pending"
         
     return db_req
 
