@@ -77,7 +77,7 @@ export default function CitizenRequests() {
           <tbody className="divide-y divide-border">
             {requests.map((r, i) => (
               <tr key={r.request_id || i} className="hover:bg-muted/50 transition-colors">
-                <td className="px-6 py-4 font-medium text-foreground">{r.request_id?.split('-')[0]}...</td>
+                <td className="px-6 py-4 font-medium text-foreground text-xs">{r.request_id}</td>
                 <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{r.category || 'N/A'}</td>
                 <td className="px-6 py-4 truncate max-w-xs" title={r.original_text || r.description}>{r.original_text || r.description}</td>
                 <td className="px-6 py-4">
