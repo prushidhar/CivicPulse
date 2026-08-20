@@ -22,7 +22,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     return await response.json();
   } catch (error) {
     console.warn("API unavailable, falling back to mock data for:", endpoint);
-    return getMockData(endpoint);
+    return handleMockRequest(endpoint, options);
   }
 }
 
@@ -72,8 +72,39 @@ export type AuditLog = {
   details: string;
 };
 
+// Memory store for mock data so UI reflects updates during demo
+let mockRecommendations: Recommendation[] = [
+  {
+    id: 'REC-1',
+    hotspotId: 'HS-1',
+    priorityScore: 92,
+    title: 'Emergency Water Truck Dispatch',
+    description: 'Dispatch 5 water trucks to Sector 4 to alleviate acute shortage.',
+    status: 'pending',
+    scores: {
+      demandIntensity: 25,
+      infrastructureGap: 20,
+      vulnerability: 15,
+      affectedPopulation: 10,
+      urgencyRisk: 10,
+      trendAcceleration: 7,
+      feasibility: 3,
+      equityAdjustment: 2
+    }
+  }
+];
+
 // Fallback data if backend is offline
-function getMockData(endpoint: string) {
+function handleMockRequest(endpoint: string, options: RequestInit) {
+  if (endpoint.includes('/decision') && options.method === 'POST' && options.body) {
+    const body = JSON.parse(options.body as string);
+    const recId = endpoint.split('/')[2];
+    mockRecommendations = mockRecommendations.map(r => 
+      r.id === recId ? { ...r, status: body.decision } : r
+    );
+    return { success: true };
+  }
+
   if (endpoint.includes('/hotspots')) {
     return [
       { id: 'HS-1', h3Index: '8a2a1072b59ffff', severity: 'high', requestCount: 452, populationDensity: 12000, lat: 40.748, lon: -73.985 },
@@ -81,26 +112,7 @@ function getMockData(endpoint: string) {
     ];
   }
   if (endpoint.includes('/recommendations')) {
-    return [
-      {
-        id: 'REC-1',
-        hotspotId: 'HS-1',
-        priorityScore: 92,
-        title: 'Emergency Water Truck Dispatch',
-        description: 'Dispatch 5 water trucks to Sector 4 to alleviate acute shortage.',
-        status: 'pending',
-        scores: {
-          demandIntensity: 25,
-          infrastructureGap: 20,
-          vulnerability: 15,
-          affectedPopulation: 10,
-          urgencyRisk: 10,
-          trendAcceleration: 7,
-          feasibility: 3,
-          equityAdjustment: 2
-        }
-      }
-    ];
+    return mockRecommendations;
   }
   if (endpoint.includes('/impact')) {
     return { estimatedPopulationReached: 45000 };
@@ -110,11 +122,18 @@ function getMockData(endpoint: string) {
       { id: 'EV-1', recommendationId: 'REC-1', type: 'citizen_report', description: '450 calls about water outage', confidence: 0.95 }
     ];
   }
+  if (endpoint.includes('/requests')) {
+    return [
+      { id: 'REQ-1', title: 'Pothole', status: 'open' },
+      { id: 'REQ-2', title: 'Water issue', status: 'open' }
+    ];
+  }
   return [];
 }
 
 export const api = {
   getHotspots: async (): Promise<Hotspot[]> => fetchWithAuth('/hotspots'),
+  getRequests: async () => fetchWithAuth('/requests'),
   getGeoUnit: async (id: string) => fetchWithAuth(`/geo/units/${id}`),
   getIndicators: async () => fetchWithAuth('/indicators'),
   getInfrastructure: async () => fetchWithAuth('/infrastructure'),
