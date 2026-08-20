@@ -13,17 +13,24 @@ class RAGService:
 
     def _get_embedding_model(self):
         if not self.embedding_model:
-            from sentence_transformers import SentenceTransformer
-            # Using a small, fast multi-lingual model suitable for CPU
-            self.embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+            try:
+                from sentence_transformers import SentenceTransformer
+                # Using a small, fast multi-lingual model suitable for CPU
+                self.embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+            except ImportError:
+                logger.warning("sentence_transformers not installed, falling back to mock embeddings")
+                self.embedding_model = "mock"
         return self.embedding_model
 
     def generate_embedding(self, text: str) -> list[float]:
-        if settings.DEMO_MODE:
-            # Generate deterministic mock embedding of length 384
+        model = self._get_embedding_model()
+        
+        if settings.DEMO_MODE or model == "mock":
+            # Generate deterministic mock embedding of length 768 to match the DB Vector size
             import hashlib
             h = hashlib.md5(text.encode()).hexdigest()
-            return [float(int(h[i:i+2], 16)) / 255.0 for i in range(0, 32)] * 12 # 32 * 12 = 384
+            # 32 chars * 24 repeats = 768 elements
+            return [float(int(h[i:i+2], 16)) / 255.0 for i in range(0, 32)] * 24
             
         model = self._get_embedding_model()
         return model.encode(text).tolist()
