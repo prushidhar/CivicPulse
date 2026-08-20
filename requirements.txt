@@ -26,3 +26,7 @@ faker>=19.0.0
 google-generativeai
 google-cloud-speech
 geopy>=2.4.0
+
+# Database / Models Support
+numpy>=1.25.0
+shapely>=2.0.0
