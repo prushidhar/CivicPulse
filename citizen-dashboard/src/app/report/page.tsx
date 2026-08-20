@@ -131,7 +131,7 @@ export default function ReportPage() {
 
     try {
       setProgress(60);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests`, {
+      const response = await fetch(`/api/v1/requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -149,7 +149,7 @@ export default function ReportPage() {
         }
         
         // Don't await strictly if we want to show success fast, but it's safer to await
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests/${requestId}/media`, {
+        await fetch(`/api/v1/requests/${requestId}/media`, {
           method: "POST",
           body: formData
         }).catch(err => console.error("Media upload failed", err));

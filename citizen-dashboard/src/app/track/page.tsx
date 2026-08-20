@@ -19,7 +19,7 @@ export default function TrackPage() {
     setHasSearched(false);
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/requests/${search.trim()}`);
+      const response = await fetch(`/api/v1/requests/${search.trim()}`);
       if (!response.ok) throw new Error("Request not found in database");
       const data = await response.json();
       setTrackData(data);
