@@ -74,9 +74,12 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
             pipeline.run_full_pipeline(str(db_req.request_id))
             db.refresh(db_req)
         except Exception as e:
+            import traceback
+            err_msg = traceback.format_exc()
             print(f"Pipeline error on demand: {e}")
             db_req.category = "Processing..."
             db_req.severity = "Pending"
+            setattr(db_req, "description", f"ERROR: {e}\n\n{err_msg}")
         
     return db_req
 
