@@ -75,6 +75,7 @@ export type AuditLog = {
 export const api = {
   getHotspots: async (): Promise<Hotspot[]> => fetchWithAuth('/hotspots'),
   getRequests: async () => fetchWithAuth('/requests'),
+  updateRequestStatus: async (id: string, status: string) => fetchWithAuth('/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
   getGeoUnit: async (id: string) => fetchWithAuth(`/geo/units/${id}`),
   getIndicators: async () => fetchWithAuth('/indicators'),
   getInfrastructure: async () => fetchWithAuth('/infrastructure'),

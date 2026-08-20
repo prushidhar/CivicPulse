@@ -33,15 +33,35 @@ export default function TrackPage() {
     }
   };
 
-  const steps = [
-    { label: "Submitted", status: "completed" },
-    { label: "AI Analysis", status: "completed" },
-    { label: "Location Verified", status: "completed" },
-    { label: "Government Review", status: "current" },
-    { label: "Decision", status: "upcoming" },
-    { label: "Implementation", status: "upcoming" },
-    { label: "Completed", status: "upcoming" },
-  ];
+  const getSteps = (status: string | undefined) => {
+    let s = 'pending';
+    if (status) s = status.toLowerCase();
+    
+    let states = ['completed', 'completed', 'completed', 'current', 'upcoming', 'upcoming', 'upcoming'];
+    
+    if (s === 'accepted') {
+      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'current', 'upcoming'];
+    } else if (s === 'in_progress') {
+      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'current', 'upcoming'];
+    } else if (s === 'resolved') {
+      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed'];
+    } else if (s === 'rejected') {
+      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'upcoming', 'upcoming'];
+    }
+    
+    return [
+      { label: 'Submitted', status: states[0] },
+      { label: 'AI Analysis', status: states[1] },
+      { label: 'Location Verified', status: states[2] },
+      { label: 'Government Review', status: states[3] },
+      { label: s === 'rejected' ? 'Decision (Rejected)' : 'Decision', status: states[4] },
+      { label: 'Implementation', status: states[5] },
+      { label: 'Completed', status: states[6] },
+    ];
+  };
+
+  const steps = getSteps(trackData?.status);
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-12 mt-8">
@@ -168,3 +188,4 @@ export default function TrackPage() {
     </div>
   );
 }
+

@@ -5,6 +5,15 @@ import { Badge } from '@/components/ui/Badge';
 export default function CitizenRequests() {
   const [requests, setRequests] = useState<any[] | null>(null);
 
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      await api.updateRequestStatus(id, newStatus);
+      fetchRequests();
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
+  };
+
   const fetchRequests = () => {
     // We added getRequests to api.ts so we fetch the raw individual reports
     api.getRequests().then(data => {
@@ -77,7 +86,7 @@ export default function CitizenRequests() {
                   </Badge>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-muted-foreground text-xs uppercase">{r.status || 'Pending'}</span>
+                  <select value={r.status || 'pending'} onChange={(e) => handleStatusChange(r.request_id, e.target.value)} className="bg-background border border-border rounded text-xs p-1 cursor-pointer"><option value="pending">PENDING</option><option value="accepted">ACCEPTED</option><option value="in_progress">IN PROGRESS</option><option value="resolved">RESOLVED</option><option value="rejected">REJECTED</option></select>
                 </td>
               </tr>
             ))}
@@ -94,3 +103,4 @@ export default function CitizenRequests() {
     </div>
   );
 }
+

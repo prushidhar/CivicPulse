@@ -1,7 +1,7 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.schemas.requests import CitizenRequestCreate, CitizenRequestResponse, CitizenRequestDetail
+from app.schemas.requests import CitizenRequestCreate, CitizenRequestResponse, CitizenRequestDetail, CitizenRequestStatusUpdate
 from app.models.models import CitizenRequest
 from app.workers.request_tasks import process_citizen_request
 from typing import List
@@ -64,5 +64,22 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     if not db_req.severity:
         db_req.severity = "Pending"
         
+    return db_req
+
+
+@router.patch('/{request_id}/status', response_model=CitizenRequestDetail)
+def update_request_status(request_id: str, update: CitizenRequestStatusUpdate, db: Session = Depends(get_db)):
+    db_req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
+    if not db_req:
+        raise HTTPException(status_code=404, detail='Request not found')
+    db_req.status = update.status
+    db.commit()
+    db.refresh(db_req)
+    db_req.location = None
+    setattr(db_req, 'description', db_req.original_text)
+    if not db_req.category:
+        db_req.category = 'Processing...'
+    if not db_req.severity:
+        db_req.severity = 'Pending'
     return db_req
 

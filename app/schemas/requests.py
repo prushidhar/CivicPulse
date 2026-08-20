@@ -1,4 +1,4 @@
-﻿from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
@@ -34,6 +34,9 @@ class CitizenRequestDetail(BaseModel):
     
     class Config:
         from_attributes = True
+
+class CitizenRequestStatusUpdate(BaseModel):
+    status: str
 
 class RecommendationDecision(BaseModel):
     reviewer: str
