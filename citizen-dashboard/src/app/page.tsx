@@ -25,7 +25,7 @@ export default function Home() {
             {greeting}, Citizen.
           </h1>
           <p className="text-xl text-primary/70 max-w-2xl mx-auto font-medium">
-            I am Corra, your public services assistant. What would you like to do today?
+            I am your CivicPulse BRICS assistant. What would you like to do today?
           </p>
         </div>
       </section>

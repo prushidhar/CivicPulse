@@ -13,7 +13,7 @@ export default function Header() {
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
             C
           </div>
-          <h1 className="text-xl font-extrabold text-primary tracking-tight">Corra</h1>
+          <h1 className="text-xl font-extrabold text-primary tracking-tight">CivicPulse BRICS</h1>
         </div>
         <div className="flex items-center gap-4">
           <select 
