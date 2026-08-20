@@ -189,7 +189,7 @@ export default function HotspotMap() {
                         <div 
                           className="h-full"
                           style={{ 
-                            width: ${((selectedCountry.hotspotScore + 1.65) / 3.17) * 100}%,
+                            width: `${((selectedCountry.hotspotScore + 1.65) / 3.17) * 100}%`,
                             backgroundColor: LEGEND_RANGES.find(r => selectedCountry.hotspotScore >= r.min && selectedCountry.hotspotScore <= r.max)?.color || '#ef4444'
                           }}
                         />
