@@ -17,7 +17,7 @@ export default function Dashboard() {
         activeHotspots: hotspots.length,
         pendingReviews: recommendations.filter(r => r.status === 'pending').length,
         priorityRecs: recommendations.filter(r => r.priorityScore > 80).length,
-        impact: impact.estimatedPopulationReached,
+        impact: (impact.length > 0 ? impact[0].estimatedPopulationReached : 0),
         openRequests: requests.length
       });
     });
