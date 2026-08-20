@@ -16,7 +16,7 @@ export default function CitizenRequests() {
       } else {
         setRequests([]);
       }
-    }).catch(() => setRequests([]));
+    }).catch(err => { console.error("Requests Fetch Error:", err); setRequests([]); });
   };
 
   useEffect(() => {

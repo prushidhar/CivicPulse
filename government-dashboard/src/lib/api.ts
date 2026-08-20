@@ -15,7 +15,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   }
   
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+    const response = await fetch(`${BASE_URL}${endpoint}${endpoint.includes("?") ? "&" : "?"}t=${Date.now()}`, { ...options, headers });
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
