@@ -22,11 +22,11 @@ export default function Header() {
             className="text-sm bg-surface border border-gray-200 text-primary rounded-xl shadow-sm outline-none px-3 py-2 font-medium focus:border-primary/30"
           >
             <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="pt">Português</option>
-            <option value="ru">Русский</option>
-            <option value="zh">中文</option>
-            <option value="hi">हिन्दी</option>
+            <option value="es">Espanol</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="zh">Chinese</option>
+            <option value="hi">Hindi</option>
           </select>
         </div>
       </div>
