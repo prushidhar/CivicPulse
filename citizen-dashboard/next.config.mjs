@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/api/v1/:path*",
-        destination: "https://falls-highways-because-highs.trycloudflare.com/api/v1/:path*",
+        destination: "https://showtimes-newton-memorial-dice.trycloudflare.com/api/v1/:path*",
       },
     ]
   },
