@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+﻿from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
@@ -22,14 +22,15 @@ class CitizenRequestDetail(BaseModel):
     status: str
     created_at: datetime
     country_code: str
-    location: Optional[Dict[str, float]]
-    category: Optional[str]
-    intent: Optional[str]
-    severity: Optional[str]
-    urgency: Optional[str]
-    original_text: Optional[str] # usually kept private, but included for demo
-    translated_text: Optional[str]
-    pii_redacted_text: Optional[str]
+    location: Optional[Dict[str, float]] = None
+    category: Optional[str] = None
+    intent: Optional[str] = None
+    severity: Optional[str] = None
+    urgency: Optional[str] = None
+    original_text: Optional[str] = None
+    description: Optional[str] = None
+    translated_text: Optional[str] = None
+    pii_redacted_text: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -38,3 +39,4 @@ class RecommendationDecision(BaseModel):
     reviewer: str
     decision: str  # ACCEPT, REJECT, EDIT
     reason: str
+

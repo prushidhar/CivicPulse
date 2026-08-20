@@ -44,6 +44,11 @@ def list_requests(db: Session = Depends(get_db)):
     reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(50).all()
     for r in reqs:
         r.location = None
+        setattr(r, "description", r.original_text)
+        if not r.category:
+            r.category = "Processing..."
+        if not r.severity:
+            r.severity = "Pending"
     return reqs
 
 @router.get("/{request_id}", response_model=CitizenRequestDetail)
@@ -53,5 +58,11 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Request not found")
     
     db_req.location = None
+    setattr(db_req, "description", db_req.original_text)
+    if not db_req.category:
+        db_req.category = "Processing..."
+    if not db_req.severity:
+        db_req.severity = "Pending"
+        
     return db_req
 
