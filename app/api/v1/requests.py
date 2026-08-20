@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+﻿from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.requests import CitizenRequestCreate, CitizenRequestResponse, CitizenRequestDetail
 from app.models.models import CitizenRequest
 from app.workers.request_tasks import process_citizen_request
+from typing import List
 
 router = APIRouter()
 
@@ -30,7 +31,6 @@ def create_request(
     db.commit()
     db.refresh(new_request)
     
-    # Send to background worker
     process_citizen_request.delay(str(new_request.request_id))
     
     return CitizenRequestResponse(
@@ -39,14 +39,19 @@ def create_request(
         received_at=new_request.created_at
     )
 
+@router.get("", response_model=List[CitizenRequestDetail])
+def list_requests(db: Session = Depends(get_db)):
+    reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(50).all()
+    for r in reqs:
+        r.location = None
+    return reqs
+
 @router.get("/{request_id}", response_model=CitizenRequestDetail)
 def get_request(request_id: str, db: Session = Depends(get_db)):
     db_req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
     if not db_req:
         raise HTTPException(status_code=404, detail="Request not found")
     
-    # In a real app we'd convert Geometry point to Dict for location
-    loc = None
-    # We will handle geospatial parsing properly later
-    
+    db_req.location = None
     return db_req
+
