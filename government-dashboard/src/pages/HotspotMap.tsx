@@ -61,7 +61,7 @@ export default function HotspotMap() {
   }
 
   // Construct the mapbox style expression for the choropleth fill color
-  const fillColorExpression = ['step', ['get', 'hotspotScore']];
+  const fillColorExpression: any[] = ['step', ['get', 'hotspotScore']];
   
   // Start with the lowest color
   fillColorExpression.push(LEGEND_RANGES[0].color);
