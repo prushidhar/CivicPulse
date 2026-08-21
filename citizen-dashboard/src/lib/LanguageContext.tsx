@@ -278,6 +278,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem("preferred_language") as Language;
     if (saved && translations[saved]) {
       setLanguage(saved);
+    } else if (typeof navigator !== "undefined" && navigator.language) {
+      // Auto-detect browser language
+      const browserLang = navigator.language.split("-")[0] as Language;
+      if (translations[browserLang]) {
+        setLanguage(browserLang);
+      }
     }
   }, []);
 

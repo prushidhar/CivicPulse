@@ -166,13 +166,25 @@ export default function CitizenRequests() {
                       <span className="text-xs text-muted-foreground italic">Anonymous</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 truncate max-w-xs" title={r.original_text || r.description}>
-                    {r.original_text || r.description}
+                  <td className="px-6 py-4 truncate max-w-xs">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-gray-900" title="Gemini Micro-Summary">{r.intent || 'Pending Analysis'}</span>
+                      <span className="text-xs text-muted-foreground truncate" title={r.original_text || r.description}>
+                        {r.original_text || r.description}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
-                    <Badge variant={getSeverityVariant(r.severity)}>
-                      {(r.severity || 'low').toUpperCase()}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getSeverityVariant(r.severity)}>
+                        {(r.severity || 'low').toUpperCase()}
+                      </Badge>
+                      {r.severity?.toLowerCase() === 'critical' && r.status === 'pending' && (
+                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-extrabold uppercase animate-pulse border border-red-200" title="Unresolved critical issue">
+                          SLA Breach
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
                     <select
