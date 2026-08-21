@@ -242,6 +242,32 @@ export default function CitizenRequests() {
                           )}
                         </div>
 
+                        {/* Media Preview */}
+                        <div className="md:col-span-3 bg-white dark:bg-background rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Citizen Evidence (Media)</span>
+                          </div>
+                          <div className="flex flex-wrap gap-4">
+                            {r.media && r.media.length > 0 ? (
+                              r.media.map((m, idx) => (
+                                <div key={idx} className="border border-border rounded overflow-hidden">
+                                  {m.type.includes('image') ? (
+                                    <img src={m.url} alt="Evidence" className="h-48 object-cover max-w-full" />
+                                  ) : m.type.includes('audio') ? (
+                                    <div className="p-3 bg-muted">
+                                      <audio src={m.url} controls className="h-10" />
+                                    </div>
+                                  ) : (
+                                    <a href={m.url} target="_blank" className="p-3 block text-primary text-sm font-medium">Download Attachment</a>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground italic">No media files attached to this report.</p>
+                            )}
+                          </div>
+                        </div>
+
                         {/* AI Metadata */}
                         <div className="md:col-span-3 grid grid-cols-4 gap-3">
                           <div className="bg-white dark:bg-background rounded-lg p-3 border border-purple-200 dark:border-purple-800 text-center">

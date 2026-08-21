@@ -63,6 +63,22 @@ export type Evidence = {
   confidence: number;
 };
 
+export interface CitizenRequest {
+  request_id: string;
+  original_text: string;
+  description: string;
+  status: string;
+  severity: string;
+  category: string;
+  intent: string;
+  translated_text?: string;
+  transcript?: string;
+  ai_confidence?: number;
+  created_at: string;
+  citizen_name?: string;
+  media?: { url: string; type: string }[];
+};
+
 export type AuditLog = {
   id: string;
   objectId: string;

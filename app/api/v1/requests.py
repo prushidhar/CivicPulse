@@ -81,6 +81,7 @@ async def transcribe_audio(request_id: str, file: UploadFile = File(...), db: Se
 
 @router.get("", response_model=List[CitizenRequestDetail])
 def list_requests(db: Session = Depends(get_db)):
+    from app.models.models import RequestMedia
     reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(100).all()
     for r in reqs:
         if r.location is not None:
@@ -98,10 +99,14 @@ def list_requests(db: Session = Depends(get_db)):
             r.category = "Processing..."
         if not r.severity:
             r.severity = "Pending"
+            
+        media_records = db.query(RequestMedia).filter(RequestMedia.request_id == r.request_id).all()
+        r.media = [{"url": f"/api/v1/media/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
     return reqs
 
 @router.get("/{request_id}", response_model=CitizenRequestDetail)
 def get_request(request_id: str, db: Session = Depends(get_db)):
+    from app.models.models import RequestMedia
     db_req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
     if not db_req:
         raise HTTPException(status_code=404, detail="Request not found")
@@ -116,6 +121,9 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
             pass
     db_req.location = None
     setattr(db_req, "description", db_req.original_text)
+    
+    media_records = db.query(RequestMedia).filter(RequestMedia.request_id == db_req.request_id).all()
+    db_req.media = [{"url": f"/api/v1/media/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
     
     # If the background pipeline never ran, run it on-demand now
     if not db_req.category:

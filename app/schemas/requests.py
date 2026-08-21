@@ -41,6 +41,7 @@ class CitizenRequestDetail(BaseModel):
     ai_confidence: Optional[float] = None
     citizen_name: Optional[str] = None
     citizen_phone: Optional[str] = None
+    media: Optional[List[Dict[str, str]]] = None
     
     class Config:
         from_attributes = True

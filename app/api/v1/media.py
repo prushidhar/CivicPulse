@@ -57,17 +57,17 @@ async def upload_media(
         raise HTTPException(status_code=404, detail="Request not found")
         
     ext = file.filename.split('.')[-1]
-    object_key = f"{request_id}/{uuid.uuid4()}.{ext}"
+    file_uuid = uuid.uuid4()
     
     os.makedirs("/tmp/civicpulse_media", exist_ok=True)
-    local_path = f"/tmp/civicpulse_media/{uuid.uuid4()}.{ext}"
+    local_path = f"/tmp/civicpulse_media/{file_uuid}.{ext}"
     
     with open(local_path, "wb") as f:
         f.write(await file.read())
         
     media = RequestMedia(
         request_id=req.request_id,
-        object_key=object_key,
+        object_key=local_path,
         media_type=file.content_type,
         scan_status="clean"
     )
@@ -77,3 +77,15 @@ async def upload_media(
     background_tasks.add_task(process_media_background, str(req.request_id), local_path, file.content_type)
     
     return {"status": "success", "media_id": str(media.media_id)}
+
+@router.get("/download/{media_id}")
+def download_media(media_id: str, db: Session = Depends(get_db)):
+    media = db.query(RequestMedia).filter(RequestMedia.media_id == media_id).first()
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+    
+    from fastapi.responses import FileResponse
+    if not os.path.exists(media.object_key):
+        raise HTTPException(status_code=404, detail="File missing on disk")
+        
+    return FileResponse(media.object_key, media_type=media.media_type)
