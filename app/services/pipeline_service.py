@@ -59,15 +59,16 @@ class RequestPipeline:
         req.entities = entities
         
         # Step 4: Geocoding & H3
-        if req.location:
+        if req.location is not None:
             import h3
-            wkt_str = str(req.location)
             try:
-                coords = wkt_str.split("POINT(")[1].split(")")[0].split(" ")
-                lon, lat = float(coords[0]), float(coords[1])
+                from geoalchemy2.shape import to_shape
+                sh = to_shape(req.location)
+                lon, lat = sh.x, sh.y
                 req.h3_cell = h3.latlng_to_cell(lat, lon, settings.H3_RESOLUTION)
                 req.geocoding_confidence = 1.0
-            except:
+            except Exception as e:
+                self.logger.error(f"H3 generation failed: {e}")
                 pass
         else:
             geo_result = geocode_entities(entities, req.country_code)

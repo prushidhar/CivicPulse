@@ -8,6 +8,18 @@ from typing import List
 
 router = APIRouter()
 
+def run_pipeline_background(request_id: str):
+    from app.core.database import SessionLocal
+    db = SessionLocal()
+    try:
+        from app.services.pipeline_service import RequestPipeline
+        pipeline = RequestPipeline(db)
+        pipeline.run_full_pipeline(request_id)
+    except Exception as e:
+        print(f"Pipeline error in background: {e}")
+    finally:
+        db.close()
+
 @router.post("", response_model=CitizenRequestResponse, status_code=202)
 def create_request(
     request: CitizenRequestCreate,
@@ -35,13 +47,8 @@ def create_request(
     db.commit()
     db.refresh(new_request)
     
-    # Run Gemini AI pipeline synchronously
-    try:
-        from app.services.pipeline_service import RequestPipeline
-        pipeline = RequestPipeline(db)
-        pipeline.run_full_pipeline(str(new_request.request_id))
-    except Exception as e:
-        print(f"Pipeline error: {e}")
+    # Run Gemini AI pipeline asynchronously to prevent 504 timeouts
+    background_tasks.add_task(run_pipeline_background, str(new_request.request_id))
     
     return CitizenRequestResponse(
         request_id=new_request.request_id,
