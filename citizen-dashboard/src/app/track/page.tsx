@@ -243,6 +243,30 @@ export default function TrackPage() {
               </div>
             </div>
           </div>
+
+          {/* Gamification & Share Section (Feature #11 & #17) */}
+          {trackData?.status === 'resolved' && (
+            <div className="mt-12 bg-gradient-to-r from-[#34A853]/10 to-[#4285F4]/10 p-8 sm:p-10 rounded-[3rem] border border-[#34A853]/20 flex flex-col md:flex-row items-center justify-between gap-8 shadow-inner animate-in zoom-in-95 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FBBC04]/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
+              
+              <div className="flex items-center gap-6 relative z-10">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 shrink-0">
+                  <span className="text-4xl">🏆</span>
+                </div>
+                <div className="space-y-1 text-left">
+                  <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">Civic Duty Complete!</h3>
+                  <p className="text-gray-600 font-medium text-lg">You earned <span className="font-extrabold text-[#34A853] bg-[#34A853]/10 px-2 py-1 rounded-lg">+50 Civic Points</span> for improving your community.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => alert("Social sharing API would open here! (Hackathon Demo)")}
+                className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold rounded-2xl shadow-md hover:shadow-lg border border-gray-200 transition-all flex items-center gap-3 shrink-0 relative z-10"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#4285F4]"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Share Impact
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

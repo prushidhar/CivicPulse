@@ -1,11 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, FileText, Search, ArrowRight, ShieldCheck, HelpCircle, Map, Zap, Globe, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageCircle, FileText, Search, ArrowRight, ShieldCheck, HelpCircle, Map as MapIcon, Zap, Globe, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 
 export default function Home() {
   const { t } = useLanguage();
+  const [liveReports, setLiveReports] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/v1/requests')
+      .then(res => res.json())
+      .then(data => {
+        const items = Array.isArray(data) ? data : data.items || [];
+        setLiveReports(items.filter((r: any) => r.latitude && r.longitude).slice(0, 50));
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-16 max-w-5xl mx-auto mt-4 pb-20">
@@ -72,6 +85,46 @@ export default function Home() {
           <p className="text-gray-600 font-medium leading-relaxed">
             Powered by H3 spatial indexing to seamlessly cluster and deduplicate reports across millions of citizens.
           </p>
+        </div>
+      </section>
+
+      {/* Live Community Impact Map */}
+      <section className="w-full px-4 mt-8 relative z-10">
+        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div>
+              <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+                <MapIcon className="w-6 h-6 text-[#4285F4]" /> Live Community Impact
+              </h2>
+              <p className="text-gray-500 font-medium mt-1">See real-time civic issues reported by citizens across India.</p>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-500">
+              <span className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-[#EA4335]"></div> Critical</span>
+              <span className="flex items-center gap-1 ml-3"><div className="w-3 h-3 rounded-full bg-[#FBBC04]"></div> Medium</span>
+              <span className="flex items-center gap-1 ml-3"><div className="w-3 h-3 rounded-full bg-[#4285F4]"></div> Logged</span>
+            </div>
+          </div>
+          <div className="h-[400px] w-full bg-gray-100">
+            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
+              <Map
+                defaultCenter={{ lat: 21.1458, lng: 79.0882 }}
+                defaultZoom={5}
+                mapId="DEMO_CITIZEN_MAP"
+                disableDefaultUI={true}
+              >
+                {liveReports.map((r, i) => (
+                  <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
+                    <div style={{
+                      width: '12px', height: '12px', borderRadius: '50%',
+                      backgroundColor: r.severity === 'critical' || r.severity === 'high' ? '#EA4335' : r.severity === 'medium' ? '#FBBC04' : '#4285F4',
+                      border: '2px solid white',
+                      boxShadow: '0 0 8px rgba(0,0,0,0.2)'
+                    }} />
+                  </AdvancedMarker>
+                ))}
+              </Map>
+            </APIProvider>
+          </div>
         </div>
       </section>
 

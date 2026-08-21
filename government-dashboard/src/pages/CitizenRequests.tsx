@@ -127,9 +127,18 @@ export default function CitizenRequests() {
               const latest = await api.getRequests();
               setRequests(latest);
             }}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors flex items-center"
+            className="px-4 py-2 bg-[#4285F4] text-white rounded-xl text-sm font-bold hover:bg-[#4285F4]/90 transition-colors flex items-center shadow-sm"
           >
             <Zap className="w-4 h-4 mr-2" /> Auto-Assign AI
+          </button>
+          
+          {/* Feature #26: Manual Merge Button */}
+          <button 
+            onClick={() => alert("Merge Duplicates workflow would open here. (Admin privileges required)")}
+            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors flex items-center shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-[#FBBC04]"><path d="M16 3h5v5"/><path d="m21 3-5 5"/><path d="M21 21H3"/><path d="m15 16-3 5-3-5"/></svg>
+            Merge Duplicates
           </button>
         </div>
       </div>
