@@ -16,7 +16,7 @@ export default function HotspotMap() {
   const [showVulnerability, setShowVulnerability] = useState(false);
 
   const fetchHotspots = () => {
-    api.getHotspots().then(setHotspots);
+    api.getHotspots().then(setHotspots).catch(() => {});
   };
 
   useEffect(() => {
@@ -59,6 +59,16 @@ export default function HotspotMap() {
             zoom: 11
           }}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+          interactiveLayerIds={['hotspot-polygons']}
+          onClick={(e) => {
+            if (e.features && e.features.length > 0) {
+              const feature = e.features[0];
+              setSelectedHotspot(feature.properties as Hotspot);
+            } else {
+              setSelectedHotspot(null);
+            }
+          }}
+          cursor={selectedHotspot ? 'pointer' : 'default'}
         >
           <NavigationControl position="top-left" />
           
@@ -113,45 +123,43 @@ export default function HotspotMap() {
         </div>
         
         <div className="p-4 flex-1">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-base">Sector 4 Node (HS-1)</CardTitle>
-                <Badge variant="destructive">High Severity</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Unique Reports</p>
-                  <p className="text-lg font-semibold">452</p>
+          {selectedHotspot ? (
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-base">Hotspot Node ({selectedHotspot.id})</CardTitle>
+                  <Badge variant={selectedHotspot.severity === 'high' ? 'destructive' : selectedHotspot.severity === 'medium' ? 'warning' : 'default'}>
+                    {selectedHotspot.severity} Severity
+                  </Badge>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Pop. Density</p>
-                  <p className="text-lg font-semibold">12,000</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Coverage Score</p>
-                  <p className="text-lg font-semibold text-yellow-600">45%</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Confidence</p>
-                  <p className="text-lg font-semibold text-green-600">92%</p>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-border">
-                <h4 className="text-sm font-medium mb-2">Underlying Citizen Reports</h4>
-                <div className="space-y-2">
-                  <div className="p-2 text-xs bg-muted rounded-md border border-border">
-                    <span className="font-semibold text-primary">Rep-092:</span> "No water for 48 hours..."
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Unique Reports</p>
+                    <p className="text-lg font-semibold">{selectedHotspot.requestCount}</p>
                   </div>
-                  <div className="p-2 text-xs bg-muted rounded-md border border-border">
-                    <span className="font-semibold text-primary">Rep-114:</span> "Low pressure across block C."
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Pop. Density</p>
+                    <p className="text-lg font-semibold">{selectedHotspot.populationDensity.toLocaleString()}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">H3 Index</p>
+                    <p className="text-sm font-mono mt-1 text-muted-foreground">{selectedHotspot.h3Index}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Location (Lat/Lon)</p>
+                    <p className="text-sm font-mono mt-1 text-muted-foreground">{Number(selectedHotspot.lat).toFixed(4)}, {Number(selectedHotspot.lon).toFixed(4)}</p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
+              <p>No hotspot selected.</p>
+              <p className="text-sm mt-1">Click a colored hexagon on the map to inspect.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
