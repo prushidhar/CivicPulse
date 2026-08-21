@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Brain, Zap, FileText } from 'lucide-react';
 export default function CitizenRequests() {
   const [requests, setRequests] = useState<any[] | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filterDepartment, setFilterDepartment] = useState<string>('All');
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
@@ -41,6 +42,14 @@ export default function CitizenRequests() {
     return 'success';
   };
 
+  const filteredRequests = requests?.filter(r => {
+    if (filterDepartment === 'All') return true;
+    const aiDept = r.transcript && r.transcript.includes('Assigned Department:') 
+      ? r.transcript.split('Assigned Department:')[1]?.split('\n')[0]?.trim() 
+      : 'Unassigned';
+    return aiDept === filterDepartment;
+  });
+
   if (!requests) {
     return (
       <div className="p-6 space-y-6 animate-pulse">
@@ -67,12 +76,26 @@ export default function CitizenRequests() {
             Powered by <strong>Google Gemini AI</strong> — click any row to see AI analysis
           </p>
         </div>
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            placeholder="Search by ID or Location..."
-            className="px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+        <div className="flex space-x-3 items-center">
+          <select 
+            className="px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+            value={filterDepartment}
+            onChange={e => setFilterDepartment(e.target.value)}
+          >
+            <option value="All">All Departments</option>
+            <option value="NHAI">NHAI (Highways)</option>
+            <option value="BBMP">BBMP (Municipal)</option>
+            <option value="PWD">PWD (Public Works)</option>
+            <option value="BESCOM">BESCOM (Energy)</option>
+            <option value="Traffic Police">Traffic Police</option>
+            <option value="Water Board">Water Board</option>
+          </select>
+          <button className="px-4 py-2 bg-background border border-border rounded-md text-sm font-medium hover:bg-muted transition-colors">
+            Export CSV
+          </button>
+          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors flex items-center">
+            <Zap className="w-4 h-4 mr-2" /> Auto-Assign AI
+          </button>
         </div>
       </div>
 
@@ -90,7 +113,7 @@ export default function CitizenRequests() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {requests.map((r, i) => (
+            {filteredRequests?.map((r, i) => (
               <React.Fragment key={r.request_id || i}>
                 <tr
                   className="hover:bg-muted/50 transition-colors cursor-pointer"

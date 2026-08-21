@@ -19,6 +19,8 @@ export default function ReportPage() {
   const [severity, setSeverity] = useState("Low");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [smsAlerts, setSmsAlerts] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   
@@ -395,38 +397,68 @@ export default function ReportPage() {
         {/* Privacy & Consent */}
         <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-8">
           
-          {isVerified ? (
-            <div className="bg-success/5 border border-success/20 p-6 rounded-2xl flex items-center justify-between">
-              <div>
-                <p className="text-success font-bold text-lg mb-1">Identity Verified</p>
-                <p className="text-success/70 font-medium text-sm">Reporting as: {name} ({phone})</p>
+          <div className="flex items-center gap-4 p-4 bg-muted/20 rounded-2xl border border-border/50">
+            <input 
+              type="checkbox" 
+              id="anonymous" 
+              checked={isAnonymous} 
+              onChange={(e) => { setIsAnonymous(e.target.checked); if(e.target.checked) setSmsAlerts(false); }} 
+              className="w-5 h-5 text-primary rounded-md cursor-pointer" 
+            />
+            <label htmlFor="anonymous" className="text-primary font-bold cursor-pointer">
+              Submit Anonymously (Hide my identity from public records)
+            </label>
+          </div>
+
+          {!isAnonymous && (
+            isVerified ? (
+              <div className="bg-success/5 border border-success/20 p-6 rounded-2xl flex items-center justify-between">
+                <div>
+                  <p className="text-success font-bold text-lg mb-1">Identity Verified</p>
+                  <p className="text-success/70 font-medium text-sm">Reporting as: {name} ({phone})</p>
+                </div>
+                <CheckCircle2 className="w-8 h-8 text-success" />
               </div>
-              <CheckCircle2 className="w-8 h-8 text-success" />
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <label className="block text-lg font-bold text-primary">Full Name</label>
-                <input 
-                  type="text" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe" 
-                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
-                  required
-                />
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <label className="block text-lg font-bold text-primary">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe" 
+                    className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
+                    required={!isAnonymous}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-lg font-bold text-primary">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+1 (555) 000-0000" 
+                    className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
+                    required={!isAnonymous}
+                  />
+                </div>
               </div>
-              <div className="space-y-4">
-                <label className="block text-lg font-bold text-primary">Phone Number</label>
-                <input 
-                  type="tel" 
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+1 (555) 000-0000" 
-                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
-                  required
-                />
-              </div>
+            )
+          )}
+
+          {!isAnonymous && (
+            <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl border border-primary/20">
+              <input 
+                type="checkbox" 
+                id="smsAlerts" 
+                checked={smsAlerts} 
+                onChange={(e) => setSmsAlerts(e.target.checked)} 
+                className="w-5 h-5 text-primary rounded-md cursor-pointer" 
+              />
+              <label htmlFor="smsAlerts" className="text-primary font-bold cursor-pointer">
+                Opt-in to receive real-time SMS status updates
+              </label>
             </div>
           )}
 

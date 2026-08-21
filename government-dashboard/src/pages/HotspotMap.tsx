@@ -198,10 +198,43 @@ export default function HotspotMap() {
               </CardContent>
             </Card>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground bg-white border-2 border-dashed border-border/60 rounded-2xl">
-              <MapPin className="w-8 h-8 mb-3 text-muted-foreground/50" />
-              <p className="font-medium text-foreground">No report selected.</p>
-              <p className="text-sm mt-1 max-w-[200px]">Click a colored point on the map to inspect the citizen report.</p>
+            <div className="space-y-6">
+              <div className="text-center text-muted-foreground p-8 flex flex-col items-center bg-white border border-dashed rounded-xl border-border/70">
+                <MapPin className="w-10 h-10 mb-3 text-muted" />
+                <p className="text-sm">Select a hotspot on the map to view details, automated severity assessments, and AI recommendations.</p>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Map Layers</h3>
+                <div className="space-y-3 bg-white p-4 rounded-xl border border-border/50">
+                  <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowHeatmap(!showHeatmap)}>
+                    <label className="text-sm font-medium cursor-pointer">Density Heatmap</label>
+                    <input type="checkbox" checked={showHeatmap} readOnly className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                  </div>
+                  <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowPoints(!showPoints)}>
+                    <label className="text-sm font-medium cursor-pointer">Citizen Report Points</label>
+                    <input type="checkbox" checked={showPoints} readOnly className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                  </div>
+                  <div className="flex items-center justify-between opacity-50 cursor-not-allowed">
+                    <label className="text-sm font-medium cursor-not-allowed">IoT Sensor Data (Beta)</label>
+                    <input type="checkbox" disabled className="w-4 h-4 rounded" />
+                  </div>
+                  <div className="flex items-center justify-between opacity-50 cursor-not-allowed">
+                    <label className="text-sm font-medium cursor-not-allowed">Live Traffic Alerts</label>
+                    <input type="checkbox" disabled className="w-4 h-4 rounded" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Quick Filters</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <button className="text-xs py-2 bg-destructive/10 text-destructive font-bold rounded-md border border-destructive/20 hover:bg-destructive/20 transition">Critical Only</button>
+                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Last 24 Hours</button>
+                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Road Hazards</button>
+                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Unassigned</button>
+                </div>
+              </div>
             </div>
           )}
         </div>
