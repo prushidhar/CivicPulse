@@ -26,6 +26,8 @@ class CitizenRequestDetail(BaseModel):
     status: str
     created_at: datetime
     country_code: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     location: Optional[Dict[str, float]] = None
     category: Optional[str] = None
     intent: Optional[str] = None
