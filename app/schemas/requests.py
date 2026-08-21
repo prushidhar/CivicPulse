@@ -11,6 +11,8 @@ class CitizenRequestCreate(BaseModel):
     consent: bool = Field(True, description="Citizen gave consent to process")
     latitude: Optional[float] = Field(None, description="GPS Latitude")
     longitude: Optional[float] = Field(None, description="GPS Longitude")
+    category: Optional[str] = Field(None, description="Citizen selected category")
+    urgency: Optional[str] = Field(None, description="Citizen selected severity/urgency")
     citizen_name: Optional[str] = Field(None, description="Name of the citizen")
     citizen_phone: Optional[str] = Field(None, description="Phone number of the citizen")
     

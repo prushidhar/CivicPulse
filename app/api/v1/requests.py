@@ -28,6 +28,7 @@ def create_request(
         citizen_phone=request.citizen_phone,
         location=location_wkt,
         severity=request.urgency,
+        category=request.category,
         status="pending"
     )
     db.add(new_request)
