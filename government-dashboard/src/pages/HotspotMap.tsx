@@ -4,12 +4,30 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { api, type Hotspot } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Layers } from 'lucide-react';
+import { Layers, MapPin } from 'lucide-react';
 import { cellToBoundary } from 'h3-js';
+
+// Haversine formula to calculate distance between two lat/lon points in kilometers
+function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function deg2rad(deg: number) {
+  return deg * (Math.PI / 180);
+}
 
 export default function HotspotMap() {
   const [hotspots, setHotspots] = useState<Hotspot[] | null>(null);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
   
   // Layer toggles
   const [showDensity, setShowDensity] = useState(true);
@@ -24,6 +42,26 @@ export default function HotspotMap() {
     const interval = setInterval(fetchHotspots, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleGeolocate = (e: any) => {
+    const { latitude, longitude } = e.coords;
+    setUserLocation({ lat: latitude, lon: longitude });
+    
+    // Automatically select the nearest hotspot
+    if (hotspots && hotspots.length > 0) {
+      let nearest = hotspots[0];
+      let minDistance = getDistanceFromLatLonInKm(latitude, longitude, nearest.lat, nearest.lon);
+      
+      for (let i = 1; i < hotspots.length; i++) {
+        const dist = getDistanceFromLatLonInKm(latitude, longitude, hotspots[i].lat, hotspots[i].lon);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearest = hotspots[i];
+        }
+      }
+      setSelectedHotspot(nearest);
+    }
+  };
 
   if (!hotspots) {
     return (
@@ -77,6 +115,7 @@ export default function HotspotMap() {
             trackUserLocation={true} 
             showUserHeading={true} 
             showUserLocation={true}
+            onGeolocate={handleGeolocate}
           />
           
           <Source id="hotspots" type="geojson" data={geoJsonData as any}>
@@ -130,6 +169,16 @@ export default function HotspotMap() {
         </div>
         
         <div className="p-4 flex-1">
+          {userLocation && (
+            <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-xl flex items-start space-x-3">
+              <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-primary">Citizen Location Detected</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Showing hotspots nearest to {userLocation.lat.toFixed(4)}, {userLocation.lon.toFixed(4)}</p>
+              </div>
+            </div>
+          )}
+
           {selectedHotspot ? (
             <Card>
               <CardHeader className="pb-3">
@@ -150,6 +199,16 @@ export default function HotspotMap() {
                     <p className="text-xs text-muted-foreground">Pop. Density</p>
                     <p className="text-lg font-semibold">{selectedHotspot.populationDensity.toLocaleString()}</p>
                   </div>
+                  
+                  {userLocation && (
+                    <div className="space-y-1 col-span-2 p-2 bg-muted/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Distance from Citizen</p>
+                      <p className="text-sm font-semibold">
+                        {getDistanceFromLatLonInKm(userLocation.lat, userLocation.lon, selectedHotspot.lat, selectedHotspot.lon).toFixed(2)} km away
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">H3 Index</p>
                     <p className="text-sm font-mono mt-1 text-muted-foreground">{selectedHotspot.h3Index}</p>
