@@ -6,17 +6,37 @@ from app.schemas.requests import RecommendationDecision
 
 router = APIRouter()
 
+def map_rec_for_frontend(rec):
+    return {
+        "id": str(rec.recommendation_id),
+        "hotspotId": "CLUSTER-001", # mock for now
+        "priorityScore": int(rec.score) if rec.score else 0,
+        "title": rec.project_type or "Infrastructure Intervention",
+        "description": rec.rationale or "AI-generated rationale based on multiple data sources.",
+        "status": rec.decision or "pending",
+        "scores": {
+            "demandIntensity": 25,
+            "infrastructureGap": 15,
+            "vulnerability": 10,
+            "affectedPopulation": 5,
+            "urgencyRisk": 10,
+            "trendAcceleration": 10,
+            "feasibility": 5,
+            "equityAdjustment": 5
+        }
+    }
+
 @router.get("")
 def list_recommendations(limit: int = 50, db: Session = Depends(get_db)):
     recs = db.query(Recommendation).order_by(Recommendation.score.desc()).limit(limit).all()
-    return recs
+    return [map_rec_for_frontend(r) for r in recs]
 
 @router.get("/{rec_id}")
 def get_recommendation(rec_id: str, db: Session = Depends(get_db)):
     rec = db.query(Recommendation).filter(Recommendation.recommendation_id == rec_id).first()
     if not rec:
         raise HTTPException(status_code=404, detail="Recommendation not found")
-    return rec
+    return map_rec_for_frontend(rec)
 
 @router.get("/{rec_id}/evidence")
 def get_recommendation_evidence(rec_id: str, db: Session = Depends(get_db)):
