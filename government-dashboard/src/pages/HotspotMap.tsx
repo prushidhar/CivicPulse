@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Map, { Source, Layer, NavigationControl } from 'react-map-gl';
+import Map, { Source, Layer, NavigationControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { api, type Hotspot } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
