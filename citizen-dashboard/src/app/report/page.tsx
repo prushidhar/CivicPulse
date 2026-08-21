@@ -15,7 +15,10 @@ export default function ReportPage() {
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
   const [severity, setSeverity] = useState("Low");
-  const [email, setEmail] = useState("");
+  const [citizenName, setCitizenName] = useState("");
+  const [citizenPhone, setCitizenPhone] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
   
   const [mapLat, setMapLat] = useState<number>(-23.5505); // Default to roughly Sao Paulo
   const [mapLng, setMapLng] = useState<number>(-46.6333);
@@ -126,7 +129,8 @@ export default function ReportPage() {
       longitude: mapLng,
       category: category || undefined,
       urgency: severity,
-      contact_email: email || undefined
+      citizen_name: citizenName || undefined,
+      citizen_phone: citizenPhone || undefined
     };
 
     try {
