@@ -214,9 +214,12 @@ export default function Dashboard() {
             <div className="space-y-4">
               {stats.recentRequests && stats.recentRequests.length > 0 ? (
                 stats.recentRequests.map((item: any, i: number) => (
-                  <div key={i} className="flex justify-between items-center p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
-                    <span className="text-sm font-medium truncate pr-4">{item.title}</span>
-                    <Badge variant={item.status === 'open' ? 'destructive' : 'default'}>
+                  <div key={item.request_id || i} className="flex justify-between items-center p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-sm font-bold truncate pr-4 capitalize">{item.category || 'Issue'}</span>
+                      <span className="text-xs text-muted-foreground truncate pr-4">{item.intent || item.original_text || 'Pending Analysis'}</span>
+                    </div>
+                    <Badge variant={item.severity === 'critical' || item.severity === 'high' ? 'destructive' : 'default'}>
                       {item.status}
                     </Badge>
                   </div>
