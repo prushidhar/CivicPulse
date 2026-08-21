@@ -34,7 +34,12 @@ export default function Recommendations() {
 
   const handleSelectRec = (rec: Recommendation) => {
     setSelectedRec(rec);
-    api.getEvidence(rec.id).then(setEvidence);
+    api.getEvidence(rec.id)
+      .then(setEvidence)
+      .catch(err => {
+        console.error("Failed to load evidence", err);
+        setEvidence([]);
+      });
   };
 
   const handleDecision = async (decision: 'accepted' | 'rejected' | 'edited') => {
@@ -152,12 +157,21 @@ export default function Recommendations() {
                     <div>
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Evidence Sources</h4>
                       <ul className="space-y-2">
-                        {evidence.map(e => (
-                          <li key={e.id} className="text-sm border-l-2 border-primary pl-3 py-1">
-                            <span className="font-medium text-foreground">{e.type.replace('_', ' ')}:</span> {e.description} 
-                            <span className="ml-2 text-xs text-green-600 font-medium">({(e.confidence * 100).toFixed(0)}% conf)</span>
+                        {Array.isArray(evidence) ? evidence.map((e: any, i) => (
+                          <li key={e.id || i} className="text-sm border-l-2 border-primary pl-3 py-1">
+                            <span className="font-medium text-foreground">{(e.type || 'Source').replace('_', ' ')}:</span> {e.description || JSON.stringify(e)} 
+                            {e.confidence && <span className="ml-2 text-xs text-green-600 font-medium">({(e.confidence * 100).toFixed(0)}% conf)</span>}
                           </li>
-                        ))}
+                        )) : (
+                          <div className="space-y-2">
+                            {Object.entries(evidence).map(([key, val], i) => (
+                               <li key={i} className="text-sm border-l-2 border-primary pl-3 py-1">
+                                 <span className="font-medium text-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
+                                 <pre className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">{typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)}</pre>
+                               </li>
+                            ))}
+                          </div>
+                        )}
                       </ul>
                     </div>
                   </CardContent>
