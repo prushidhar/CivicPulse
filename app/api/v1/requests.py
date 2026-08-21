@@ -24,6 +24,8 @@ def create_request(
         source_channel=request.source_channel,
         language=request.language,
         consent_status=request.consent,
+        citizen_name=request.citizen_name,
+        citizen_phone=request.citizen_phone,
         location=location_wkt,
         status="pending"
     )

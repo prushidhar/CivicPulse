@@ -11,6 +11,8 @@ class CitizenRequestCreate(BaseModel):
     consent: bool = Field(True, description="Citizen gave consent to process")
     latitude: Optional[float] = Field(None, description="GPS Latitude")
     longitude: Optional[float] = Field(None, description="GPS Longitude")
+    citizen_name: Optional[str] = Field(None, description="Name of the citizen")
+    citizen_phone: Optional[str] = Field(None, description="Phone number of the citizen")
     
 class CitizenRequestResponse(BaseModel):
     request_id: UUID
@@ -31,6 +33,8 @@ class CitizenRequestDetail(BaseModel):
     description: Optional[str] = None
     translated_text: Optional[str] = None
     pii_redacted_text: Optional[str] = None
+    citizen_name: Optional[str] = None
+    citizen_phone: Optional[str] = None
     
     class Config:
         from_attributes = True
