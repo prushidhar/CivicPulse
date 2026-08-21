@@ -66,19 +66,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 px-4 mb-20">
-      <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4">
+    <div className="max-w-lg mx-auto mt-16 px-4 mb-20 relative">
+      <div className="absolute top-1/2 right-0 w-64 h-64 bg-[#4285F4]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#EA4335]/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2"></div>
+      
+      <div className="bg-white p-8 sm:p-12 rounded-[3rem] shadow-xl border border-gray-100 animate-in fade-in slide-in-from-bottom-4 relative z-10">
         
         <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center">
-            <ShieldCheck className="w-8 h-8" />
+          <div className="w-20 h-20 bg-[#34A853]/10 text-[#34A853] rounded-full flex items-center justify-center shadow-inner">
+            <ShieldCheck className="w-10 h-10" />
           </div>
         </div>
         
-        <h1 className="text-3xl font-extrabold text-primary text-center tracking-tight mb-2">
+        <h1 className="text-4xl font-extrabold text-gray-900 text-center tracking-tight mb-3">
           Verify Identity
         </h1>
-        <p className="text-primary/60 text-center font-medium mb-8">
+        <p className="text-gray-500 text-center font-medium mb-10 text-lg">
           {step === 1 && "Enter your phone number to receive a secure code."}
           {step === 2 && `We sent a code to ${phone}. Enter it below.`}
           {step === 3 && "Almost done! What should we call you?"}
@@ -92,24 +95,24 @@ export default function LoginPage() {
 
         {step === 1 && (
           <form onSubmit={handleSendOtp} className="space-y-6">
-            <div className="relative">
-              <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-primary/40" />
+            <div className="relative group">
+              <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-[#4285F4] transition-colors" />
               <input 
                 type="tel" 
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Phone Number" 
-                className="w-full pl-14 pr-6 py-4 bg-background border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold text-lg placeholder:text-primary/40 transition" 
+                className="w-full pl-16 pr-6 py-5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-[#4285F4] focus:ring-4 focus:ring-[#4285F4]/10 text-gray-900 font-bold text-lg placeholder:text-gray-400 transition-all" 
                 required
               />
             </div>
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2"
+              className="w-full py-5 bg-[#4285F4] text-white rounded-2xl font-bold text-lg hover:bg-[#4285F4]/90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                <>Send OTP <ArrowRight className="w-5 h-5" /></>
+                <>Send OTP <ArrowRight className="w-6 h-6" /></>
               )}
             </button>
           </form>

@@ -268,41 +268,43 @@ export default function ReportPage() {
       </div>
     );
   }
-
   return (
-    <div className="max-w-3xl mx-auto mt-8 space-y-10 mb-20">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-extrabold text-primary tracking-tight">{t("reportTitle")}</h1>
-        <p className="text-xl text-primary/60 font-medium">{t("reportDesc")}</p>
+    <div className="max-w-4xl mx-auto mt-8 space-y-12 mb-20 relative">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#4285F4]/5 rounded-full blur-3xl -translate-y-1/2"></div>
+      
+      <div className="space-y-4 text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">{t("reportTitle")}</h1>
+        <p className="text-xl text-gray-500 font-medium">{t("reportDesc")}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
         
         {/* Input Modes */}
-        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
-          <label className="block text-lg font-bold text-primary">{t("describeIssue")}</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-8 sm:p-12 rounded-[3rem] shadow-xl border border-gray-100 space-y-6">
+          <label className="block text-xl font-extrabold text-gray-900">{t("describeIssue")}</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <textarea 
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="w-full p-6 bg-background border-none rounded-[2rem] resize-none focus:ring-2 focus:ring-primary/20 outline-none h-40 text-primary font-medium placeholder:text-primary/40"
+              className="w-full p-8 bg-gray-50 border border-gray-200 rounded-[2.5rem] resize-none focus:bg-white focus:border-[#4285F4] focus:ring-4 focus:ring-[#4285F4]/10 outline-none h-48 text-gray-900 font-medium placeholder:text-gray-400 transition-all text-lg"
               placeholder={t("describePlaceholder")}
             ></textarea>
-            <div className="flex flex-col gap-4 h-40">
+
+            <div className="flex flex-col gap-5 h-48">
               <div 
                 onClick={toggleRecording}
-                className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition border ${recording ? 'border-secondary bg-secondary/5 text-secondary' : audioBlob ? 'border-success bg-success/5 text-success' : 'border-gray-200 bg-surface hover:bg-background text-primary/60'}`}
+                className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition-all border-2 shadow-sm hover:shadow-md ${recording ? 'border-[#EA4335] bg-[#EA4335]/5 text-[#EA4335]' : audioBlob ? 'border-[#34A853] bg-[#34A853]/5 text-[#34A853]' : 'border-gray-200 bg-white hover:border-[#4285F4] hover:bg-gray-50 text-gray-600'}`}
               >
                 {recording ? (
-                  <Square className="w-6 h-6 text-secondary fill-secondary animate-pulse" />
+                  <Square className="w-6 h-6 text-[#EA4335] fill-[#EA4335] animate-pulse" />
                 ) : (
-                  <Mic className={`w-6 h-6 ${audioBlob ? 'text-success' : 'text-primary/40'}`} />
+                  <Mic className={`w-7 h-7 ${audioBlob ? 'text-[#34A853]' : 'text-gray-400'}`} />
                 )}
-                <span className="font-bold">
+                <span className="font-bold text-lg tracking-wide">
                   {recording ? "Recording..." : audioBlob ? "Recorded!" : t("tapRecord")}
                 </span>
               </div>
-              <label className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition border ${uploadedFile ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-surface hover:bg-background text-primary/60'}`}>
+              <label className={`flex-1 rounded-[2rem] flex items-center justify-center gap-3 cursor-pointer transition-all border-2 shadow-sm hover:shadow-md ${uploadedFile ? 'border-[#4285F4] bg-[#4285F4]/5 text-[#4285F4]' : 'border-gray-200 bg-white hover:border-[#4285F4] hover:bg-gray-50 text-gray-600'}`}>
                 <input 
                   type="file" 
                   className="hidden" 
@@ -313,7 +315,7 @@ export default function ReportPage() {
                     }
                   }} 
                 />
-                <span className="font-bold truncate px-4">
+                <span className="font-bold truncate px-4 text-lg tracking-wide">
                   {uploadedFile ? uploadedFile.name : t("orUpload")}
                 </span>
               </label>
