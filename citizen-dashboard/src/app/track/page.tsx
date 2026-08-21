@@ -117,8 +117,17 @@ export default function TrackPage() {
               <h2 className="text-3xl font-extrabold text-primary">Request #{submittedId.toUpperCase()}</h2>
               <p className="text-primary/50 font-medium">Submitted on Aug 18, 2026</p>
             </div>
-            <span className="px-6 py-3 bg-secondary/10 text-secondary rounded-2xl font-bold text-sm">
-              {t("underReview")}
+            <span className={`px-6 py-3 rounded-2xl font-bold text-sm ${
+              trackData?.status === 'resolved' ? 'bg-success/10 text-success' :
+              trackData?.status === 'rejected' ? 'bg-danger/10 text-danger' :
+              trackData?.status === 'in_progress' ? 'bg-primary/10 text-primary' :
+              'bg-secondary/10 text-secondary'
+            }`}>
+              {trackData?.status === 'resolved' ? 'Completed' :
+               trackData?.status === 'rejected' ? 'Rejected' :
+               trackData?.status === 'in_progress' ? 'In Progress' :
+               trackData?.status === 'accepted' ? 'Accepted' :
+               t("underReview")}
             </span>
           </div>
 
