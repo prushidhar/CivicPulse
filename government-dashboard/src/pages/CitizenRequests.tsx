@@ -90,10 +90,39 @@ export default function CitizenRequests() {
             <option value="Traffic Police">Traffic Police</option>
             <option value="Water Board">Water Board</option>
           </select>
-          <button className="px-4 py-2 bg-background border border-border rounded-md text-sm font-medium hover:bg-muted transition-colors">
+          <button 
+            onClick={() => {
+              const csv = [
+                ['Request ID', 'Category', 'Severity', 'Status', 'Department'],
+                ...(filteredRequests || []).map(r => [
+                  r.request_id, r.category, r.severity, r.status, 
+                  r.transcript?.includes('Assigned Department:') ? r.transcript.split('Assigned Department:')[1].split('\n')[0].trim() : 'Unassigned'
+                ])
+              ].map(e => e.join(',')).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'civicpulse_requests.csv';
+              a.click();
+            }}
+            className="px-4 py-2 bg-background border border-border rounded-md text-sm font-medium hover:bg-muted transition-colors"
+          >
             Export CSV
           </button>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors flex items-center">
+          <button 
+            onClick={async () => {
+              const pending = (filteredRequests || []).filter(r => r.status === 'pending');
+              if (pending.length === 0) return alert('No pending requests to auto-assign.');
+              alert(`AI is auto-assigning ${pending.length} pending requests based on departmental routing...`);
+              for (const p of pending) {
+                await api.updateRequestStatus(p.request_id, 'accepted');
+              }
+              const latest = await api.getRequests();
+              setRequests(latest);
+            }}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors flex items-center"
+          >
             <Zap className="w-4 h-4 mr-2" /> Auto-Assign AI
           </button>
         </div>
