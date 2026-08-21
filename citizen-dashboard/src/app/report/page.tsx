@@ -138,7 +138,8 @@ export default function ReportPage() {
       });
       const data = await response.json();
       
-      const requestId = data.id || data.request_id || "REQ-" + Math.floor(Math.random() * 100000).toString();
+      const requestId = data.id || data.request_id;
+      if (!requestId) throw new Error("No request ID returned");
 
       if (audioBlob || uploadedFile) {
         const formData = new FormData();
@@ -147,14 +148,14 @@ export default function ReportPage() {
         } else if (uploadedFile) {
           formData.append("file", uploadedFile);
         }
-        
+
         // Don't await strictly if we want to show success fast, but it's safer to await
         await fetch(`/api/v1/requests/${requestId}/media`, {
           method: "POST",
           body: formData
         }).catch(err => console.error("Media upload failed", err));
       }
-      
+
       setProgress(100);
       setAiResult({
         request_id: requestId,
@@ -167,16 +168,9 @@ export default function ReportPage() {
       setTimeout(() => setStep("success"), 500);
     } catch (error) {
       console.error("API error", error);
-      setProgress(100);
-      setAiResult({
-        request_id: "REQ-" + Math.floor(Math.random() * 100000).toString(),
-        language: "Auto",
-        category: category || "General",
-        severity: severity,
-        confidence: "90%",
-        location: `Lat: ${mapLat.toFixed(2)}, Lng: ${mapLng.toFixed(2)}`
-      });
-      setTimeout(() => setStep("success"), 500);
+      alert("Failed to submit report. Please check your connection and try again.");
+      setStep("form");
+      setProgress(0);
     }
   };
 
