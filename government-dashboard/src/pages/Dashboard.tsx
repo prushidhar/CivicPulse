@@ -6,13 +6,14 @@ import { Badge } from '@/components/ui/Badge';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchStats = () => {
     Promise.all([
-      api.getHotspots(),
-      api.getRecommendations(),
-      api.getImpact(),
-      api.getRequests ? api.getRequests() : Promise.resolve([])
+      api.getHotspots().catch(() => []),
+      api.getRecommendations().catch(() => []),
+      api.getImpact().catch(() => ({ estimatedPopulationReached: 0 })),
+      api.getRequests ? api.getRequests().catch(() => []) : Promise.resolve([])
     ]).then(([hotspots, recommendations, impact, requests]) => {
       const openReqs = requests.filter((r: any) => r.status === 'open' || r.status === 'pending').length;
       const closedReqs = requests.filter((r: any) => r.status === 'closed' || r.status === 'resolved').length;
@@ -28,8 +29,9 @@ export default function Dashboard() {
         resolutionRate: ((closedReqs / totalReqs) * 100).toFixed(1),
         recentRequests: requests.slice(0, 5)
       });
-    }).catch(() => {
-      // Keep loading state if API fails
+      setError(null);
+    }).catch((err) => {
+      setError("Failed to fetch dashboard data.");
     });
   };
 
@@ -73,6 +75,13 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm flex items-center">
+          <AlertTriangle className="w-5 h-5 mr-2" />
+          {error} Backend API might be unreachable.
+        </div>
+      )}
 
       {/* Citizen Report Metrics */}
       <div>
@@ -207,7 +216,10 @@ export default function Dashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground text-center mt-4">No recent reports found.</p>
+                <p className="text-sm text-muted-foreground text-center mt-4 flex flex-col items-center">
+                  <span className="mb-2">No recent reports found.</span>
+                  <span className="text-xs opacity-75">Connect backend to view live data.</span>
+                </p>
               )}
             </div>
           </CardContent>
