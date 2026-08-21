@@ -182,8 +182,8 @@ export default function ReportPage() {
       longitude: mapLng,
       category: category || undefined,
       urgency: severity,
-      citizen_name: name || undefined,
-      citizen_phone: phone || undefined
+      citizen_name: isAnonymous ? undefined : (name || undefined),
+      citizen_phone: isAnonymous ? undefined : (phone || undefined)
     };
 
     try {
