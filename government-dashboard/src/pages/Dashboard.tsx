@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Activity, AlertTriangle, FileCheck, Target, MessageSquare, Bot, Clock, Zap } from 'lucide-react';
+import { Activity, AlertTriangle, FileCheck, Target, MessageSquare, Bot, Clock, Zap, Map } from 'lucide-react';
 import { api } from '@/lib/api';
+import { Badge } from '@/components/ui/Badge';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -13,12 +14,19 @@ export default function Dashboard() {
       api.getImpact(),
       api.getRequests ? api.getRequests() : Promise.resolve([])
     ]).then(([hotspots, recommendations, impact, requests]) => {
+      const openReqs = requests.filter((r: any) => r.status === 'open' || r.status === 'pending').length;
+      const closedReqs = requests.filter((r: any) => r.status === 'closed' || r.status === 'resolved').length;
+      const totalReqs = requests.length || 1; // avoid division by zero
+      
       setStats({
         activeHotspots: hotspots.length,
-        pendingReviews: recommendations.filter(r => r.status === 'pending').length,
-        priorityRecs: recommendations.filter(r => r.priorityScore > 80).length,
-        impact: (impact.length > 0 ? impact[0].estimatedPopulationReached : 0),
-        openRequests: requests.length
+        pendingReviews: recommendations.filter((r: any) => r.status === 'pending').length,
+        priorityRecs: recommendations.filter((r: any) => r.priorityScore > 80).length,
+        impact: impact.estimatedPopulationReached,
+        openRequests: openReqs,
+        resolvedRequests: closedReqs,
+        resolutionRate: ((closedReqs / totalReqs) * 100).toFixed(1),
+        recentRequests: requests.slice(0, 5)
       });
     }).catch(() => {
       // Keep loading state if API fails
@@ -57,23 +65,20 @@ export default function Dashboard() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Overview</h1>
-          <p className="text-muted-foreground mt-1">Monitor assistant health and public service requests.</p>
+          <p className="text-muted-foreground mt-1">Live metrics generated from actual citizen reports.</p>
         </div>
         <div className="flex space-x-3">
           <button className="px-4 py-2 bg-white border border-border/50 shadow-sm rounded-xl text-sm font-medium hover:bg-muted/50 transition-colors">
             Export Report
           </button>
-          <button className="px-4 py-2 bg-primary text-white shadow-md shadow-primary/20 rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
-            Configure Assistant
-          </button>
         </div>
       </div>
 
-      {/* Corra AI Health Metrics */}
+      {/* Citizen Report Metrics */}
       <div>
         <h2 className="text-lg font-bold mb-4 flex items-center">
-          <Bot className="w-5 h-5 mr-2 text-primary" />
-          CivicPulse Assistant Health
+          <MessageSquare className="w-5 h-5 mr-2 text-primary" />
+          Citizen Reporting Metrics
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/10">
@@ -82,10 +87,9 @@ export default function Dashboard() {
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-500">
                   <Target className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">+2.4%</span>
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Resolution Rate</p>
-              <h3 className="text-3xl font-extrabold mt-1">94.2%</h3>
+              <p className="text-sm font-medium text-muted-foreground">Overall Resolution Rate</p>
+              <h3 className="text-3xl font-extrabold mt-1">{stats.resolutionRate}%</h3>
             </CardContent>
           </Card>
           
@@ -95,10 +99,9 @@ export default function Dashboard() {
                 <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
                   <AlertTriangle className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">+0.8%</span>
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Human Fallback Rate</p>
-              <h3 className="text-3xl font-extrabold mt-1">5.8%</h3>
+              <p className="text-sm font-medium text-muted-foreground">Unresolved Open Reports</p>
+              <h3 className="text-3xl font-extrabold mt-1">{stats.openRequests}</h3>
             </CardContent>
           </Card>
 
@@ -106,12 +109,11 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                  <Clock className="w-5 h-5" />
+                  <FileCheck className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">-12ms</span>
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Avg. Response Latency</p>
-              <h3 className="text-3xl font-extrabold mt-1">840ms</h3>
+              <p className="text-sm font-medium text-muted-foreground">Total Resolved</p>
+              <h3 className="text-3xl font-extrabold mt-1">{stats.resolvedRequests}</h3>
             </CardContent>
           </Card>
         </div>
@@ -179,32 +181,34 @@ export default function Dashboard() {
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="col-span-2 bg-white">
           <CardHeader>
-            <CardTitle>Assistant Topic Trends</CardTitle>
+            <CardTitle>Report Geography</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[250px] w-full bg-muted/20 flex flex-col items-center justify-center text-muted-foreground rounded-xl border border-dashed border-border/60">
-              <MessageSquare className="w-8 h-8 mb-2 opacity-50" />
-              <p className="text-sm font-medium">Chart Visualization Loading</p>
+              <Map className="w-8 h-8 mb-2 opacity-50" />
+              <p className="text-sm font-medium">Regional Distribution Map Loading</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-white">
           <CardHeader>
-            <CardTitle>Top Unanswered</CardTitle>
+            <CardTitle>Recent Citizen Reports</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { q: "How to apply for solar rebate?", count: 142 },
-                { q: "Sector 4 water schedule", count: 89 },
-                { q: "New bridge toll fees", count: 45 }
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between items-center p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
-                  <span className="text-sm font-medium truncate pr-4">{item.q}</span>
-                  <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-md">{item.count}</span>
-                </div>
-              ))}
+              {stats.recentRequests && stats.recentRequests.length > 0 ? (
+                stats.recentRequests.map((item: any, i: number) => (
+                  <div key={i} className="flex justify-between items-center p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
+                    <span className="text-sm font-medium truncate pr-4">{item.title}</span>
+                    <Badge variant={item.status === 'open' ? 'destructive' : 'default'}>
+                      {item.status}
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground text-center mt-4">No recent reports found.</p>
+              )}
             </div>
           </CardContent>
         </Card>
