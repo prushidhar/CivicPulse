@@ -1,7 +1,8 @@
 from fastapi import APIRouter
-from . import requests, hotspots, recommendations, demo, media, auth, catalogs, audit, impact, dashboard_data
+from . import requests, hotspots, recommendations, demo, media, auth, catalogs, audit, impact, dashboard_data, transcribe
 
 router = APIRouter()
+router.include_router(transcribe.router, tags=["Transcription"])
 router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 router.include_router(requests.router, prefix="/requests", tags=["Requests"])
 router.include_router(media.router, prefix="/requests", tags=["Media"])
