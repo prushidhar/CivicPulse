@@ -173,8 +173,8 @@ export default function ReportPage() {
     setProgress(30);
 
     const payload = {
-      text: text,
-      country_code: "BR",
+      text: text.trim() || (audioBlob ? "Attached audio recording" : uploadedFile ? "Attached media file" : "No description provided"),
+      country_code: "IN",
       source_channel: "web",
       language: "auto",
       consent: true,
@@ -193,9 +193,14 @@ export default function ReportPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      
       const data = await response.json();
       
-      const requestId = data.id || data.request_id || "REQ-" + Math.floor(Math.random() * 100000).toString();
+      if (!response.ok) {
+        throw new Error(data.detail ? JSON.stringify(data.detail) : "Failed to create request");
+      }
+      
+      const requestId = data.id || data.request_id;
 
       if (audioBlob || uploadedFile) {
         const formData = new FormData();
@@ -205,7 +210,6 @@ export default function ReportPage() {
           formData.append("file", uploadedFile);
         }
         
-        // Don't await strictly if we want to show success fast, but it's safer to await
         await fetch(`/api/v1/requests/${requestId}/media`, {
           method: "POST",
           body: formData
@@ -222,18 +226,11 @@ export default function ReportPage() {
         location: `Lat: ${mapLat.toFixed(2)}, Lng: ${mapLng.toFixed(2)}`
       });
       setTimeout(() => setStep("success"), 500);
-    } catch (error) {
+    } catch (error: any) {
       console.error("API error", error);
-      setProgress(100);
-      setAiResult({
-        request_id: "REQ-" + Math.floor(Math.random() * 100000).toString(),
-        language: "Auto",
-        category: category || "General",
-        severity: severity,
-        confidence: "90%",
-        location: `Lat: ${mapLat.toFixed(2)}, Lng: ${mapLng.toFixed(2)}`
-      });
-      setTimeout(() => setStep("success"), 500);
+      alert("Failed to submit report. Please ensure you have entered a description and try again. Error: " + error.message);
+      setStep("form");
+      setProgress(0);
     }
   };
 
