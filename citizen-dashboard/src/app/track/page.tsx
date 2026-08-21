@@ -151,7 +151,13 @@ export default function TrackPage() {
                   <div className="text-purple-900 font-medium text-lg bg-purple-50 p-6 rounded-3xl border border-purple-100/50">
                     <p className="mb-4"><strong>Summary:</strong> {trackData.transcript.includes('AI Summary:') ? trackData.transcript.split('AI Summary:')[1]?.split('\n\nRecommended Action:')[0]?.trim() : trackData.transcript}</p>
                     {trackData.transcript.includes('Recommended Action:') && (
-                      <p><strong>Recommended Gov Action:</strong> {trackData.transcript.split('Recommended Action:')[1]?.trim()}</p>
+                      <p className="mb-4"><strong>Recommended Gov Action:</strong> {trackData.transcript.split('Recommended Action:')[1]?.split('\n\nAssigned Department:')[0]?.trim()}</p>
+                    )}
+                    {trackData.transcript.includes('Assigned Department:') && (
+                      <p className="mb-4"><strong>Routed To:</strong> {trackData.transcript.split('Assigned Department:')[1]?.split('\n\nRisk Assessment:')[0]?.trim()}</p>
+                    )}
+                    {trackData.transcript.includes('Risk Assessment:') && (
+                      <p><strong>Hazard Risk:</strong> {trackData.transcript.split('Risk Assessment:')[1]?.trim()}</p>
                     )}
                   </div>
                 </div>

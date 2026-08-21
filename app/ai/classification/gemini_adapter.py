@@ -21,6 +21,8 @@ Analyze the following citizen request and return ONLY a valid JSON object with t
 - confidence (float: 0.0 to 1.0, your classification confidence)
 - summary (string: one clear sentence describing the issue for a government official)
 - recommended_action (string: one clear sentence on what the government should do)
+- department (string: the specific Indian Government department that should handle this, e.g., 'NHAI', 'BBMP', 'PWD', 'BESCOM', 'Traffic Police', 'Water Board', 'NDRF')
+- risk_assessment (string: one sentence analyzing the hazard/risk to public safety)
 - translated_text (string: English translation of the text — if already English, return as-is)
 
 Return ONLY the JSON. No markdown, no explanation.

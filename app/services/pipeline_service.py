@@ -43,8 +43,10 @@ class RequestPipeline:
         # Save the AI-generated summary as the transcript field (for display)
         ai_summary = classification.get('summary', '')
         ai_action = classification.get('recommended_action', '')
+        ai_dept = classification.get('department', 'General Administration')
+        ai_risk = classification.get('risk_assessment', 'Standard risk level.')
         if ai_summary:
-            req.transcript = f"AI Summary: {ai_summary}\n\nRecommended Action: {ai_action}"
+            req.transcript = f"AI Summary: {ai_summary}\n\nRecommended Action: {ai_action}\n\nAssigned Department: {ai_dept}\n\nRisk Assessment: {ai_risk}"
         
         # Only set severity from AI if citizen didn't select one
         if not req.severity or req.severity.lower() in ('pending', 'none', ''):
