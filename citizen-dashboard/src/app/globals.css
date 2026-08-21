@@ -18,3 +18,9 @@ body {
     display: none !important;
 }
 
+
+/* Hide the white error dialog box in newer Google Maps API versions */
+.gm-style div:has(> table .dismissButton) {
+    display: none !important;
+}
+
