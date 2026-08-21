@@ -10,6 +10,7 @@ done
 echo "Postgres is up. Creating extensions if needed..."
 # Run SQL to ensure extensions are created. 
 # We need both postgis and vector
+export PGPASSWORD=postgres
 psql -h db -U postgres -d civicpulse -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 psql -h db -U postgres -d civicpulse -c "CREATE EXTENSION IF NOT EXISTS vector;"
 

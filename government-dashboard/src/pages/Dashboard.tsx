@@ -23,7 +23,7 @@ export default function Dashboard() {
         activeHotspots: hotspots.length,
         pendingReviews: recommendations.filter((r: any) => r.status === 'pending').length,
         priorityRecs: recommendations.filter((r: any) => r.priorityScore > 80).length,
-        impact: impact.estimatedPopulationReached,
+        impact: Array.isArray(impact) ? impact.reduce((sum: number, item: any) => sum + (item.estimatedPopulationReached || 0), 0) : (impact?.estimatedPopulationReached || 0),
         openRequests: openReqs,
         resolvedRequests: closedReqs,
         resolutionRate: ((closedReqs / totalReqs) * 100).toFixed(1),

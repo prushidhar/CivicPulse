@@ -69,6 +69,7 @@ export default function CitizenRequests() {
             <tr>
               <th className="px-6 py-3 font-medium">Request ID</th>
               <th className="px-6 py-3 font-medium">Category</th>
+              <th className="px-6 py-3 font-medium">Citizen</th>
               <th className="px-6 py-3 font-medium">Description</th>
               <th className="px-6 py-3 font-medium">Severity</th>
               <th className="px-6 py-3 font-medium">Status</th>
@@ -79,6 +80,16 @@ export default function CitizenRequests() {
               <tr key={r.request_id || i} className="hover:bg-muted/50 transition-colors">
                 <td className="px-6 py-4 font-medium text-foreground text-xs">{r.request_id}</td>
                 <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{r.category || 'N/A'}</td>
+                <td className="px-6 py-4">
+                  {r.citizen_name ? (
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">{r.citizen_name}</span>
+                      <span className="text-xs text-muted-foreground">{r.citizen_phone}</span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">Anonymous</span>
+                  )}
+                </td>
                 <td className="px-6 py-4 truncate max-w-xs" title={r.original_text || r.description}>{r.original_text || r.description}</td>
                 <td className="px-6 py-4">
                   <Badge variant={r.severity === 'high' ? 'destructive' : r.severity === 'medium' ? 'warning' : 'success'}>

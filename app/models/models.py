@@ -25,6 +25,8 @@ class CitizenRequest(Base):
     translated_text = Column(Text)
     pii_redacted_text = Column(Text)
     consent_status = Column(Boolean, default=True)
+    citizen_name = Column(String, nullable=True)
+    citizen_phone = Column(String, nullable=True)
     category = Column(String)
     subcategory = Column(String)
     intent = Column(String)
