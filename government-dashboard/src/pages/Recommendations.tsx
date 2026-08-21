@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 
 export default function Recommendations() {
-  const [recommendations, setRecommendations] = useState<Recommendation[] | null>(null);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [selectedRec, setSelectedRec] = useState<Recommendation | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [decisionReason, setDecisionReason] = useState('');
@@ -16,13 +16,15 @@ export default function Recommendations() {
   const fetchRecs = () => {
     api.getRecommendations()
       .then(data => {
-        setRecommendations(data);
-        if (data.length > 0) handleSelectRec(data[0]);
+        const validData = Array.isArray(data) ? data : (data as any).items || [];
+        setRecommendations(validData);
+        if (validData.length > 0) handleSelectRec(validData[0]);
         setError(null);
       })
       .catch(err => {
         console.error(err);
         setError("Failed to fetch recommendations. Backend API is unreachable.");
+        setRecommendations([]);
       });
   };
 
