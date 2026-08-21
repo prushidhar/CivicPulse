@@ -85,8 +85,11 @@ def list_requests(db: Session = Depends(get_db)):
     for r in reqs:
         if r.location is not None:
             try:
-                r.longitude = db.scalar(r.location.ST_X())
-                r.latitude = db.scalar(r.location.ST_Y())
+                # WKBElement needs to be converted to a shape or parsed
+                from geoalchemy2.shape import to_shape
+                sh = to_shape(r.location)
+                r.longitude = sh.x
+                r.latitude = sh.y
             except Exception as e:
                 pass
         r.location = None
@@ -105,8 +108,10 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     
     if db_req.location is not None:
         try:
-            db_req.longitude = db.scalar(db_req.location.ST_X())
-            db_req.latitude = db.scalar(db_req.location.ST_Y())
+            from geoalchemy2.shape import to_shape
+            sh = to_shape(db_req.location)
+            db_req.longitude = sh.x
+            db_req.latitude = sh.y
         except:
             pass
     db_req.location = None
