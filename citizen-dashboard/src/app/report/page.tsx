@@ -129,6 +129,12 @@ export default function ReportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!otpSent || otp !== "1234") {
+      alert("Please verify your identity with the correct OTP (1234) before submitting.");
+      return;
+    }
+
     setStep("processing");
     setProgress(30);
 
