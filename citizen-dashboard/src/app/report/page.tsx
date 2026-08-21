@@ -329,18 +329,58 @@ export default function ReportPage() {
           </div>
         </div>
 
+        {/* Citizen Authentication (Mock OTP) */}
+        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
+          <label className="block text-xl font-bold text-primary">Verify Your Identity</label>
+          {!otpSent ? (
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-primary/70">Phone Number</label>
+              <div className="flex gap-4">
+                <input
+                  type="tel"
+                  value={citizenPhone}
+                  onChange={(e) => setCitizenPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  className="flex-1 p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setOtpSent(true)}
+                  disabled={!citizenPhone}
+                  className="px-6 bg-primary text-white font-bold rounded-2xl disabled:opacity-50"
+                >
+                  Send OTP
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-primary/70">Enter OTP (Hint: type 1234)</label>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="1234"
+                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40 tracking-widest text-lg"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-primary/70">Full Name</label>
+                <input
+                  type="text"
+                  value={citizenName}
+                  onChange={(e) => setCitizenName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Privacy & Consent */}
-        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-8">
-          <div className="space-y-4">
-            <label className="block text-lg font-bold text-primary">{t("contactEmail")}</label>
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com" 
-              className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
-            />
-          </div>
+        <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-4">
           <div className="flex items-start gap-4">
             <input type="checkbox" id="consent" required className="mt-1.5 w-5 h-5 text-primary rounded-md border-gray-300 focus:ring-primary cursor-pointer" />
             <label htmlFor="consent" className="text-primary/60 font-medium leading-relaxed cursor-pointer">
@@ -349,8 +389,12 @@ export default function ReportPage() {
           </div>
         </div>
 
-        <button type="submit" className="w-full py-6 bg-primary text-white rounded-[2rem] font-extrabold text-xl hover:bg-primary/90 transition shadow-lg flex items-center justify-center gap-3">
-          {t("submitRequest")}
+        <button 
+          type="submit" 
+          disabled={!otpSent || otp !== "1234"}
+          className="w-full py-6 bg-primary text-white rounded-[2rem] font-extrabold text-xl hover:bg-primary/90 transition shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {!otpSent ? "Please Verify Identity to Submit" : otp !== "1234" ? "Waiting for OTP Verification..." : t("submitRequest")}
         </button>
       </form>
     </div>
