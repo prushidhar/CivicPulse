@@ -7,7 +7,9 @@ import os
 
 router = APIRouter()
 
-def process_media_background(request_id: str, local_path: str, content_type: str, db: Session):
+def process_media_background(request_id: str, local_path: str, content_type: str):
+    from app.core.database import SessionLocal
+    db = SessionLocal()
     try:
         req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
         if not req: return
@@ -40,6 +42,8 @@ def process_media_background(request_id: str, local_path: str, content_type: str
         pipeline.run_full_pipeline(str(req.request_id))
     except Exception as e:
         print(f"Pipeline re-run error on media: {e}")
+    finally:
+        db.close()
 
 @router.post("/{request_id}/media")
 async def upload_media(
@@ -70,6 +74,6 @@ async def upload_media(
     db.add(media)
     db.commit()
     
-    background_tasks.add_task(process_media_background, str(req.request_id), local_path, file.content_type, db)
+    background_tasks.add_task(process_media_background, str(req.request_id), local_path, file.content_type)
     
     return {"status": "success", "media_id": str(media.media_id)}
