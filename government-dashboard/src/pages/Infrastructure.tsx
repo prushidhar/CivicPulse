@@ -20,9 +20,16 @@ export default function Infrastructure() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Infrastructure & Investments</h1>
-        <p className="text-muted-foreground mt-1">Monitor asset conditions, capacity constraints, and planned project overlap.</p>
+      <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100/50 mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#34A853]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#4285F4]/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
+        
+        <div className="relative z-10">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
+            Infrastructure & Investments
+          </h1>
+          <p className="text-gray-500 mt-2 font-medium">Monitor asset conditions, capacity constraints, and planned project overlap.</p>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

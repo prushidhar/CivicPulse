@@ -66,26 +66,28 @@ export default function TrackPage() {
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 mt-8">
-      <div className="text-center space-y-6">
-        <div className="mx-auto w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
-          <Search className="w-8 h-8" />
+    <div className="max-w-5xl mx-auto space-y-16 mt-8 relative pb-20">
+      <div className="absolute top-0 left-1/2 w-96 h-96 bg-[#4285F4]/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+      
+      <div className="text-center space-y-6 relative z-10">
+        <div className="mx-auto w-20 h-20 bg-white border border-gray-100 shadow-lg text-[#4285F4] rounded-full flex items-center justify-center mb-6">
+          <Search className="w-10 h-10" />
         </div>
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-          {t("trackTitle")}
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900">
+          Track Request
         </h1>
-        <p className="text-xl text-primary/70 max-w-xl mx-auto font-medium">
-          {t("trackDesc")}
+        <p className="text-xl text-gray-500 max-w-xl mx-auto font-medium">
+          Enter your CivicPulse ID to see real-time updates and AI routing status.
         </p>
       </div>
 
-      <div className="bg-surface p-4 sm:p-6 rounded-[2rem] shadow-sm border border-gray-100 max-w-2xl mx-auto">
+      <div className="bg-white p-4 sm:p-6 rounded-[2.5rem] shadow-xl border border-gray-100 max-w-3xl mx-auto relative z-10">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-primary/40" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-[#4285F4]/60" />
             <input 
               type="text" 
-              placeholder={t("trackPlaceholder")}
+              placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-16 pr-6 py-5 bg-background/50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 font-bold text-lg text-primary placeholder:text-primary/40"
@@ -111,30 +113,54 @@ export default function TrackPage() {
       )}
 
       {hasSearched && trackData && !loading && (
-        <div className="bg-surface p-8 sm:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-10 animate-in fade-in slide-in-from-bottom-4">
+        <div className="bg-white p-8 sm:p-12 rounded-[3rem] shadow-xl border border-gray-200/60 space-y-12 animate-in fade-in slide-in-from-bottom-4 relative z-10">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-8 border-b border-gray-100">
             <div className="space-y-2">
-              <h2 className="text-3xl font-extrabold text-primary">Request #{submittedId.slice(0,8).toUpperCase()}</h2>
-              <p className="text-primary/50 font-medium">
+              <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Request #{submittedId.slice(0,8).toUpperCase()}</h2>
+              <p className="text-gray-500 font-medium text-lg">
                 Submitted on {trackData?.created_at ? new Date(trackData.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
               </p>
             </div>
-            <span className={`px-6 py-3 rounded-2xl font-bold text-sm ${
-              trackData?.status === 'resolved' ? 'bg-success/10 text-success' :
-              trackData?.status === 'rejected' ? 'bg-danger/10 text-danger' :
-              trackData?.status === 'in_progress' ? 'bg-primary/10 text-primary' :
-              'bg-secondary/10 text-secondary'
+            <span className={`px-6 py-3 rounded-2xl font-bold text-sm tracking-wide uppercase ${
+              trackData?.status === 'resolved' ? 'bg-[#34A853]/10 text-[#34A853]' :
+              trackData?.status === 'rejected' ? 'bg-[#EA4335]/10 text-[#EA4335]' :
+              trackData?.status === 'in_progress' ? 'bg-[#FBBC04]/10 text-[#FBBC04]' :
+              'bg-[#4285F4]/10 text-[#4285F4]'
             }`}>
               {trackData?.status === 'resolved' ? 'Completed' :
                trackData?.status === 'rejected' ? 'Rejected' :
                trackData?.status === 'in_progress' ? 'In Progress' :
-               trackData?.status === 'accepted' ? 'Accepted' :
-               t("underReview")}
+               'Pending Processing'}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
-            <div className="md:col-span-3 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="md:col-span-1 space-y-12">
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">AI Categorization</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-4 py-2 bg-gray-50 rounded-xl text-gray-800 font-bold border border-gray-100">{trackData?.category || "Unknown"}</span>
+                    <span className="px-4 py-2 bg-[#EA4335]/5 text-[#EA4335] rounded-xl font-bold border border-[#EA4335]/10">{trackData?.severity || "Normal"}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Location</h3>
+                  <div className="flex items-start gap-4 text-gray-800 bg-gray-50 p-6 rounded-3xl border border-gray-100/80">
+                    <div className="w-10 h-10 bg-[#4285F4]/10 rounded-full flex items-center justify-center shrink-0">
+                      <MapPin className="w-5 h-5 text-[#4285F4]" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-lg">Lat: {trackData?.latitude ? trackData.latitude.toFixed(4) : "..."} <br/> Lng: {trackData?.longitude ? trackData.longitude.toFixed(4) : "..."}</p>
+                      <span className="block text-xs text-gray-500 mt-2 font-medium">Precise location hidden for privacy</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 space-y-12">
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">{t("problemSummary")}</h3>
                 <p className="text-primary font-medium text-lg bg-background p-6 rounded-3xl border border-gray-100/50">

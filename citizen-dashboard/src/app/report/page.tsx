@@ -200,21 +200,27 @@ export default function ReportPage() {
 
   if (step === "processing") {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 flex flex-col items-center justify-center space-y-8 text-center animate-in fade-in zoom-in-95">
-        <Loader2 className="w-16 h-16 text-primary animate-spin" />
-        <h2 className="text-3xl font-extrabold text-primary">Processing Your Request</h2>
-        <div className="w-full bg-primary/10 rounded-full h-3">
-          <div className="bg-primary h-3 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+      <div className="max-w-2xl mx-auto py-24 px-4 flex flex-col items-center justify-center space-y-12 text-center animate-in fade-in zoom-in-95 relative">
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-[#4285F4]/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        
+        <div className="relative z-10 flex flex-col items-center space-y-6">
+          <Loader2 className="w-20 h-20 text-[#4285F4] animate-spin drop-shadow-md" />
+          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Processing with Google AI...</h2>
         </div>
-        <div className="flex flex-col gap-4 text-sm font-bold w-full max-w-sm text-left">
-          <div className={`flex items-center gap-3 ${progress >= 30 ? "text-primary" : "text-primary/30"}`}>
-            <CheckCircle2 className="w-5 h-5" /> Request Submitted
+        
+        <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner relative z-10">
+          <div className="h-full rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#FBBC04]" style={{ width: `${progress}%` }}></div>
+        </div>
+
+        <div className="flex flex-col gap-5 text-sm font-bold w-full max-w-sm text-left relative z-10 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div className={`flex items-center gap-3 transition-colors ${progress >= 30 ? "text-[#34A853]" : "text-gray-300"}`}>
+            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Uploading Media Evidence</span>
           </div>
-          <div className={`flex items-center gap-3 ${progress >= 60 ? "text-primary" : "text-primary/30"}`}>
-            <CheckCircle2 className="w-5 h-5" /> Saving Data
+          <div className={`flex items-center gap-3 transition-colors ${progress >= 60 ? "text-[#34A853]" : "text-gray-300"}`}>
+            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Gemini Vision Analysis</span>
           </div>
-          <div className={`flex items-center gap-3 ${progress >= 100 ? "text-primary" : "text-primary/30"}`}>
-            <CheckCircle2 className="w-5 h-5" /> Finalizing
+          <div className={`flex items-center gap-3 transition-colors ${progress >= 100 ? "text-[#34A853]" : "text-gray-300"}`}>
+            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Generating Spatial H3 Clusters</span>
           </div>
         </div>
       </div>
@@ -223,24 +229,40 @@ export default function ReportPage() {
 
   if (step === "success" && aiResult) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4">
-        <div className="bg-surface p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-8">
-          <div className="mx-auto w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-4">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <div className="space-y-3">
-            <h2 className="text-3xl font-extrabold text-primary">Report Registered</h2>
-            <p className="text-primary/60 font-medium text-lg">Your tracking reference is: <strong className="text-primary bg-background px-3 py-1.5 rounded-xl border border-gray-200">{aiResult.request_id}</strong></p>
+      <div className="max-w-2xl mx-auto py-16 px-4 animate-in fade-in slide-in-from-bottom-4 relative">
+        <div className="absolute top-0 right-10 w-72 h-72 bg-[#34A853]/10 rounded-full blur-3xl -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-10 w-72 h-72 bg-[#4285F4]/10 rounded-full blur-3xl translate-y-1/2"></div>
+
+        <div className="bg-white p-12 rounded-[3rem] shadow-xl border border-gray-100 text-center space-y-10 relative z-10">
+          <div className="mx-auto w-24 h-24 bg-gradient-to-br from-[#34A853] to-[#2ecc71] text-white rounded-full flex items-center justify-center mb-6 shadow-lg shadow-[#34A853]/30">
+            <CheckCircle2 className="w-12 h-12" />
           </div>
           
-          <div className="bg-background p-6 rounded-3xl text-left text-sm text-primary grid grid-cols-2 gap-6 border border-gray-100">
-            <div className="space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">{t("category")}</span> <span className="font-bold text-lg">{aiResult.category}</span></div>
-            <div className="space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">{t("severity")}</span> <span className="font-bold text-secondary text-lg">{aiResult.severity}</span></div>
-            <div className="col-span-2 space-y-1"><span className="text-primary/50 font-bold uppercase tracking-wider block text-xs">Location Summary</span> <span className="font-bold text-lg">{aiResult.location}</span></div>
+          <div className="space-y-4">
+            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Report Registered</h2>
+            <p className="text-gray-500 font-medium text-xl leading-relaxed">
+              Your tracking reference is: <br/>
+              <strong className="text-gray-900 bg-gray-50 px-5 py-2 rounded-2xl border border-gray-200 mt-3 inline-block shadow-sm font-mono text-xl">{aiResult.request_id}</strong>
+            </p>
+          </div>
+          
+          <div className="bg-gray-50 p-8 rounded-[2rem] text-left text-sm text-gray-900 grid grid-cols-2 gap-8 border border-gray-200/60 shadow-inner">
+            <div className="space-y-2">
+              <span className="text-[#4285F4] font-bold uppercase tracking-wider block text-xs">AI Category</span> 
+              <span className="font-bold text-xl">{aiResult.category}</span>
+            </div>
+            <div className="space-y-2">
+              <span className="text-[#EA4335] font-bold uppercase tracking-wider block text-xs">AI Severity</span> 
+              <span className="font-bold text-xl">{aiResult.severity}</span>
+            </div>
+            <div className="col-span-2 space-y-2">
+              <span className="text-[#FBBC04] font-bold uppercase tracking-wider block text-xs">Location Summary</span> 
+              <span className="font-bold text-lg leading-snug">{aiResult.location}</span>
+            </div>
           </div>
 
-          <Link href="/track" className="inline-flex items-center justify-center gap-3 w-full py-5 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md">
-            {t("trackBtn")} <ArrowRight className="w-5 h-5" />
+          <Link href="/track" className="inline-flex items-center justify-center gap-3 w-full py-5 bg-[#4285F4] text-white rounded-2xl font-bold text-xl hover:bg-[#4285F4]/90 transition shadow-lg shadow-[#4285F4]/20 hover:shadow-xl hover:shadow-[#4285F4]/30">
+            Track Status <ArrowRight className="w-6 h-6" />
           </Link>
         </div>
       </div>
