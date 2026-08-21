@@ -33,6 +33,8 @@ class CitizenRequestDetail(BaseModel):
     description: Optional[str] = None
     translated_text: Optional[str] = None
     pii_redacted_text: Optional[str] = None
+    transcript: Optional[str] = None
+    ai_confidence: Optional[float] = None
     citizen_name: Optional[str] = None
     citizen_phone: Optional[str] = None
     

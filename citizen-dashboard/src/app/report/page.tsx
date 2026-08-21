@@ -123,10 +123,31 @@ export default function ReportPage() {
           }
         };
 
-        mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = async () => {
           const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
           setAudioBlob(blob);
-          stream.getTracks().forEach(track => track.stop()); // Stop mic
+          stream.getTracks().forEach(track => track.stop());
+          
+          // Auto-transcribe using Gemini multimodal via backend
+          try {
+            // First create a temporary request to get an ID for transcription
+            const tempFormData = new FormData();
+            tempFormData.append("file", blob, "recording.webm");
+            // Send directly to a quick transcription check endpoint
+            const transcribeRes = await fetch("/api/v1/transcribe-audio", {
+              method: "POST",
+              body: tempFormData,
+            });
+            if (transcribeRes.ok) {
+              const { transcription } = await transcribeRes.json();
+              if (transcription) {
+                setText(transcription);
+              }
+            }
+          } catch (err) {
+            console.error("Transcription error:", err);
+            // Silently fail — user can still type manually
+          }
         };
 
         mediaRecorder.start();

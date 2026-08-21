@@ -114,8 +114,10 @@ export default function TrackPage() {
         <div className="bg-surface p-8 sm:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-10 animate-in fade-in slide-in-from-bottom-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-8 border-b border-gray-100">
             <div className="space-y-2">
-              <h2 className="text-3xl font-extrabold text-primary">Request #{submittedId.toUpperCase()}</h2>
-              <p className="text-primary/50 font-medium">Submitted on Aug 18, 2026</p>
+              <h2 className="text-3xl font-extrabold text-primary">Request #{submittedId.slice(0,8).toUpperCase()}</h2>
+              <p className="text-primary/50 font-medium">
+                Submitted on {trackData?.created_at ? new Date(trackData.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}
+              </p>
             </div>
             <span className={`px-6 py-3 rounded-2xl font-bold text-sm ${
               trackData?.status === 'resolved' ? 'bg-success/10 text-success' :

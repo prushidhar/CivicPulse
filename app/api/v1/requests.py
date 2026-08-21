@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.requests import CitizenRequestCreate, CitizenRequestResponse, CitizenRequestDetail, CitizenRequestStatusUpdate
@@ -34,7 +34,7 @@ def create_request(
     db.commit()
     db.refresh(new_request)
     
-    # Run pipeline synchronously for Vercel/demo environment instead of Celery
+    # Run Gemini AI pipeline synchronously
     try:
         from app.services.pipeline_service import RequestPipeline
         pipeline = RequestPipeline(db)
@@ -47,6 +47,36 @@ def create_request(
         status="processing",
         received_at=new_request.created_at
     )
+
+
+@router.post("/{request_id}/transcribe")
+async def transcribe_audio(request_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Transcribe audio using Gemini multimodal and update the request text."""
+    db_req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
+    if not db_req:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    try:
+        audio_bytes = await file.read()
+        mime_type = file.content_type or "audio/webm"
+        
+        from app.ai.classification.gemini_adapter import transcribe_audio_with_gemini
+        transcription = transcribe_audio_with_gemini(audio_bytes, mime_type)
+        
+        if transcription:
+            db_req.transcript = transcription
+            if not db_req.original_text:
+                db_req.original_text = transcription
+            db.commit()
+            return {"transcription": transcription, "request_id": request_id}
+        else:
+            raise HTTPException(status_code=422, detail="Could not transcribe audio")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
 
 @router.get("", response_model=List[CitizenRequestDetail])
 def list_requests(db: Session = Depends(get_db)):
@@ -69,7 +99,7 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     db_req.location = None
     setattr(db_req, "description", db_req.original_text)
     
-    # If the background pipeline never ran, run it on-demand now!
+    # If the background pipeline never ran, run it on-demand now
     if not db_req.category:
         try:
             from app.services.pipeline_service import RequestPipeline
@@ -102,4 +132,3 @@ def update_request_status(request_id: str, update: CitizenRequestStatusUpdate, d
     if not db_req.severity:
         db_req.severity = 'Pending'
     return db_req
-
