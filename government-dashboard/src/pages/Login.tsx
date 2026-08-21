@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ï»¿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, KeyRound, Smartphone, ArrowRight, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -110,7 +110,7 @@ export default function Login() {
                       maxLength={4}
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      placeholder="• • • •"
+                      placeholder="ï¿½ ï¿½ ï¿½ ï¿½"
                       className="w-full pl-10 pr-4 py-2 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-transparent tracking-[0.5em] font-mono text-lg"
                       required
                       autoFocus

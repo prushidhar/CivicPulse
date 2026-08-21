@@ -33,10 +33,7 @@ export default function Header() {
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            C
-          </div>
-          <h1 className="text-xl font-extrabold text-primary tracking-tight">CivicPulse BRICS</h1>
+          <img src="/logo.jpg" alt="CivicPulse Logo" className="h-10 md:h-12 object-contain" />
         </Link>
         <div className="flex items-center gap-4">
           {isLoggedIn ? (

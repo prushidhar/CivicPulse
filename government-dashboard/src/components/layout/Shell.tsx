@@ -37,12 +37,9 @@ export default function Shell() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between h-20 px-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-md shadow-primary/20">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-foreground">CivicPulse</span>
+        <div className="flex items-center justify-between px-6 h-20 border-b border-border/50 bg-background/95 backdrop-blur z-20">
+          <div className="flex items-center gap-3">
+            <img src="/logo.jpg" alt="CivicPulse Logo" className="h-8 md:h-10 object-contain" />
           </div>
           <button className="lg:hidden text-muted-foreground hover:text-foreground bg-muted p-2 rounded-full" onClick={() => setSidebarOpen(false)}>
             <X className="w-4 h-4" />

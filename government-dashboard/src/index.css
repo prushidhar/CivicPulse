@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    /* Citizen Dashboard Theme Alignment */
-    --background: 36 21% 96%; /* #f7f5f2 Warm off-white */
-    --foreground: 210 33% 16%; /* Deep authoritative slate/blue */
+    /* Google Theme Alignment */
+    --background: 210 17% 98%; /* #f8f9fa Google Light Gray */
+    --foreground: 210 6% 13%; /* #202124 Google Dark Grey */
 
-    /* #1c2a38 Deep authoritative slate/blue */
-    --primary: 210 33% 16%;
+    /* #202124 Google Dark Grey */
+    --primary: 210 6% 13%;
     --primary-foreground: 0 0% 100%;
 
-    /* #e06c4f Warm terracotta accent */
-    --secondary: 12 70% 59%;
+    /* #4285F4 Google Blue */
+    --secondary: 217 89% 61%;
     --secondary-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%; /* #dc2626 */
+    --destructive: 4 81% 56%; /* #EA4335 Google Red */
     --destructive-foreground: 0 0% 100%;
 
     --muted: 36 10% 90%;
