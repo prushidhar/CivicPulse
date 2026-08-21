@@ -81,8 +81,14 @@ async def transcribe_audio(request_id: str, file: UploadFile = File(...), db: Se
 
 @router.get("", response_model=List[CitizenRequestDetail])
 def list_requests(db: Session = Depends(get_db)):
-    reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(50).all()
+    reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(100).all()
     for r in reqs:
+        if r.location is not None:
+            try:
+                r.longitude = db.scalar(r.location.ST_X())
+                r.latitude = db.scalar(r.location.ST_Y())
+            except Exception as e:
+                pass
         r.location = None
         setattr(r, "description", r.original_text)
         if not r.category:
@@ -97,6 +103,12 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     if not db_req:
         raise HTTPException(status_code=404, detail="Request not found")
     
+    if db_req.location is not None:
+        try:
+            db_req.longitude = db.scalar(db_req.location.ST_X())
+            db_req.latitude = db.scalar(db_req.location.ST_Y())
+        except:
+            pass
     db_req.location = None
     setattr(db_req, "description", db_req.original_text)
     
