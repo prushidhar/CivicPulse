@@ -11,11 +11,23 @@ export default function Recommendations() {
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [decisionReason, setDecisionReason] = useState('');
 
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRecs = () => {
+    api.getRecommendations()
+      .then(data => {
+        setRecommendations(data);
+        if (data.length > 0) handleSelectRec(data[0]);
+        setError(null);
+      })
+      .catch(err => {
+        console.error(err);
+        setError("Failed to fetch recommendations. Backend API is unreachable.");
+      });
+  };
+
   useEffect(() => {
-    api.getRecommendations().then(recs => {
-      setRecommendations(recs);
-      if (recs.length > 0) handleSelectRec(recs[0]);
-    });
+    fetchRecs();
   }, []);
 
   const handleSelectRec = (rec: Recommendation) => {
