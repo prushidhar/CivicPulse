@@ -23,7 +23,7 @@ export default function ReportPage() {
   const [authChecked, setAuthChecked] = useState(false);
   
   useEffect(() => {
-    const authDataStr = localStorage.getItem("citizen_auth");
+    const authDataStr = sessionStorage.getItem("citizen_auth");
     if (!authDataStr) {
       router.push("/login?redirect=/report");
       return;

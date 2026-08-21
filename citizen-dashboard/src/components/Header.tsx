@@ -1,11 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check initial auth state
+    const checkAuth = () => {
+      setIsLoggedIn(!!sessionStorage.getItem("citizen_auth"));
+    };
+    checkAuth();
+    
+    // Listen for custom event to update header instantly when logging in/out across components
+    window.addEventListener("auth_changed", checkAuth);
+    return () => window.removeEventListener("auth_changed", checkAuth);
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("citizen_auth");
+    setIsLoggedIn(false);
+    window.dispatchEvent(new Event("auth_changed"));
+    router.push("/");
+  };
 
   return (
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/5">
@@ -17,12 +39,21 @@ export default function Header() {
           <h1 className="text-xl font-extrabold text-primary tracking-tight">CivicPulse BRICS</h1>
         </Link>
         <div className="flex items-center gap-4">
-          <Link 
-            href="/login" 
-            className="hidden sm:flex items-center justify-center px-5 py-2.5 bg-primary/5 hover:bg-primary/10 text-primary font-bold rounded-xl transition shadow-sm border border-primary/10"
-          >
-            Login / Sign Up
-          </Link>
+          {isLoggedIn ? (
+            <button 
+              onClick={handleLogout}
+              className="hidden sm:flex items-center justify-center px-5 py-2.5 bg-danger/10 hover:bg-danger/20 text-danger font-bold rounded-xl transition shadow-sm border border-danger/20"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link 
+              href="/login" 
+              className="hidden sm:flex items-center justify-center px-5 py-2.5 bg-primary/5 hover:bg-primary/10 text-primary font-bold rounded-xl transition shadow-sm border border-primary/10"
+            >
+              Login / Sign Up
+            </Link>
+          )}
           <select 
             value={language}
             onChange={(e) => setLanguage(e.target.value as any)}

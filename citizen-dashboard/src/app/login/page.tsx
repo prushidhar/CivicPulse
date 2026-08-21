@@ -48,13 +48,16 @@ export default function LoginPage() {
       return;
     }
     
-    // Save to localStorage
+    // Save to sessionStorage so it clears when tab is closed
     const authData = {
       name: name.trim(),
       phone: phone.trim(),
       isVerified: true
     };
-    localStorage.setItem("citizen_auth", JSON.stringify(authData));
+    sessionStorage.setItem("citizen_auth", JSON.stringify(authData));
+    
+    // Notify other components (like Header) to update immediately
+    window.dispatchEvent(new Event("auth_changed"));
     
     setLoading(true);
     setTimeout(() => {
