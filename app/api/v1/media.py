@@ -49,9 +49,32 @@ async def upload_media(
             
         transcription = transcribe_audio_with_gemini(audio_bytes, file.content_type)
         if transcription:
-            if not req.original_text:
+            if not req.original_text or req.original_text == "Attached audio recording" or req.original_text == "Attached media file" or req.original_text == "No description provided":
                 req.original_text = transcription
             # We don't overwrite req.transcript because that holds the Gemini AI Summary!
             db.commit()
+            
+    # If it's an image, run Gemini Vision to analyze the civic issue
+    elif file.content_type and "image" in file.content_type:
+        from app.ai.classification.gemini_adapter import analyze_image_with_gemini
+        with open(local_path, "rb") as f:
+            image_bytes = f.read()
+            
+        vision_analysis = analyze_image_with_gemini(image_bytes, file.content_type)
+        if vision_analysis:
+            # Append the visual evidence analysis to the request text so the classification pipeline sees it
+            if not req.original_text or req.original_text == "Attached media file" or req.original_text == "No description provided":
+                req.original_text = f"[VISUAL EVIDENCE]: {vision_analysis}"
+            else:
+                req.original_text = f"{req.original_text}\n\n[VISUAL EVIDENCE]: {vision_analysis}"
+            db.commit()
+            
+    # Re-run pipeline if we extracted new text/vision data so the AI analyzes it
+    try:
+        from app.services.pipeline_service import RequestPipeline
+        pipeline = RequestPipeline(db)
+        pipeline.run_full_pipeline(str(req.request_id))
+    except Exception as e:
+        print(f"Pipeline re-run error on media: {e}")
         
     return {"status": "success", "media_id": str(media.media_id)}

@@ -56,11 +56,24 @@ def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/web
     """Uses Gemini multimodal to transcribe audio from citizen voice reports."""
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        import google.generativeai as genai_lib
         audio_part = {"mime_type": mime_type, "data": audio_bytes}
-        prompt = "Transcribe this audio recording exactly as spoken. Return only the transcribed text, nothing else."
-        response = model.generate_content([prompt, audio_part])
+        response = model.generate_content([
+            "Please accurately transcribe this audio. Return ONLY the transcription text, nothing else.",
+            audio_part
+        ])
         return response.text.strip()
     except Exception as e:
-        logger.error(f"Gemini Audio Transcription Error: {e}")
+        logger.error(f"Gemini ASR Error: {e}")
+        return ""
+
+def analyze_image_with_gemini(image_bytes: bytes, mime_type: str = "image/jpeg") -> str:
+    """Uses Gemini multimodal to extract a visual description of citizen photo reports."""
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        image_part = {"mime_type": mime_type, "data": image_bytes}
+        prompt = "Analyze this image submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem (e.g., 'A deep pothole on a paved road filled with water. There is heavy traffic nearby.'). Do not make assumptions, just describe the visual evidence."
+        response = model.generate_content([prompt, image_part])
+        return response.text.strip()
+    except Exception as e:
+        logger.error(f"Gemini Vision Error: {e}")
         return ""
