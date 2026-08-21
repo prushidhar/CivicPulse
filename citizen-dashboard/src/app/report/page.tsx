@@ -129,6 +129,12 @@ export default function ReportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isVerified) {
+      alert("Please log in to verify your identity before submitting.");
+      return;
+    }
+
     setStep("processing");
     setProgress(30);
 
@@ -142,8 +148,8 @@ export default function ReportPage() {
       longitude: mapLng,
       category: category || undefined,
       urgency: severity,
-      reporter_name: name || undefined,
-      reporter_phone: phone || undefined
+      citizen_name: name || undefined,
+      citizen_phone: phone || undefined
     };
 
     try {
