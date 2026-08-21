@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    /* Corra Inspired Theme */
-    --background: 210 40% 98%; /* Soft slate-50 */
-    --foreground: 222.2 84% 4.9%;
+    /* Citizen Dashboard Theme Alignment */
+    --background: 36 21% 96%; /* #f7f5f2 Warm off-white */
+    --foreground: 210 33% 16%; /* Deep authoritative slate/blue */
 
-    /* Vibrant indigo/purple for primary */
-    --primary: 250 84% 60%;
-    --primary-foreground: 210 40% 98%;
+    /* #1c2a38 Deep authoritative slate/blue */
+    --primary: 210 33% 16%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* #e06c4f Warm terracotta accent */
+    --secondary: 12 70% 59%;
+    --secondary-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%; /* #dc2626 */
+    --destructive-foreground: 0 0% 100%;
 
-    /* Softer muted tones */
-    --muted: 214 32% 91%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 36 10% 90%;
+    --muted-foreground: 210 10% 45%;
 
-    --accent: 250 84% 96%;
-    --accent-foreground: 250 84% 40%;
+    --accent: 12 70% 96%;
+    --accent-foreground: 12 70% 40%;
 
     --border: 214.3 31.8% 91.4%;
     --radius: 1rem;
