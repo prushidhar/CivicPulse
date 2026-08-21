@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Map, { Source, Layer, NavigationControl } from 'react-map-gl/maplibre';
+import Map, { Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { api, type Hotspot } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -71,6 +71,13 @@ export default function HotspotMap() {
           cursor={selectedHotspot ? 'pointer' : 'default'}
         >
           <NavigationControl position="top-left" />
+          <GeolocateControl 
+            position="top-left" 
+            positionOptions={{ enableHighAccuracy: true }} 
+            trackUserLocation={true} 
+            showUserHeading={true} 
+            showUserLocation={true}
+          />
           
           <Source id="hotspots" type="geojson" data={geoJsonData as any}>
             <Layer
