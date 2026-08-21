@@ -5,28 +5,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Layers, MapPin, Globe, AlertTriangle } from 'lucide-react';
 import { api } from '@/lib/api';
 
-const HeatmapLayer = ({ data, visible }: { data: any[], visible: boolean }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (!map || !(window as any).google) return;
-    const heatmap = new (window as any).google.maps.visualization.HeatmapLayer({
-      data: data.map(pt => ({
-        location: new (window as any).google.maps.LatLng(pt.latitude, pt.longitude),
-        weight: pt.weight
-      })),
-      radius: 20,
-      opacity: 0.8
-    });
-    heatmap.setMap(visible ? map : null);
-    return () => heatmap.setMap(null);
-  }, [map, data, visible]);
-  return null;
-};
-
 export default function HotspotMap() {
   const [requests, setRequests] = useState<any[]>([]);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
-  const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPoints, setShowPoints] = useState(true);
 
   useEffect(() => {
@@ -37,13 +18,6 @@ export default function HotspotMap() {
       setRequests(valid);
     }).catch(console.error);
   }, []);
-
-  const heatmapData = useMemo(() => {
-    return requests.map(r => ({
-      ...r,
-      weight: r.severity === 'high' || r.severity === 'critical' ? 1.0 : r.severity === 'medium' ? 0.6 : 0.2
-    }));
-  }, [requests]);
 
   const getColor = (severity: string) => {
     switch(severity) {
@@ -58,7 +32,7 @@ export default function HotspotMap() {
   return (
     <div className="flex h-full w-full relative">
       <div className="flex-1 h-full w-full relative bg-[#eef1f4]">
-        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''} libraries={['visualization']}>
+        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
           <Map
             defaultCenter={{ lat: 28.6139, lng: 77.2090 }}
             defaultZoom={4.5}
@@ -66,8 +40,6 @@ export default function HotspotMap() {
             disableDefaultUI={true}
             zoomControl={true}
           >
-            <HeatmapLayer data={heatmapData} visible={showHeatmap} />
-            
             {showPoints && requests.map((r, i) => (
               <AdvancedMarker 
                 key={i}
@@ -79,7 +51,7 @@ export default function HotspotMap() {
                   backgroundColor: getColor(r.severity),
                   border: '2px solid white',
                   boxShadow: '0 0 4px rgba(0,0,0,0.3)',
-                  opacity: showHeatmap ? 0.7 : 1
+                  opacity: 1
                 }} />
               </AdvancedMarker>
             ))}
@@ -93,10 +65,6 @@ export default function HotspotMap() {
             <h3 className="font-semibold text-sm">Map Layers</h3>
           </div>
           <div className="space-y-3">
-            <label className="flex items-center space-x-2 text-sm cursor-pointer">
-              <input type="checkbox" checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} className="rounded border-gray-300 text-primary focus:ring-primary" />
-              <span>Density Heatmap</span>
-            </label>
             <label className="flex items-center space-x-2 text-sm cursor-pointer">
               <input type="checkbox" checked={showPoints} onChange={(e) => setShowPoints(e.target.checked)} className="rounded border-gray-300 text-primary focus:ring-primary" />
               <span>Live Reports</span>
@@ -172,10 +140,6 @@ export default function HotspotMap() {
               <div className="space-y-4">
                 <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Map Layers</h3>
                 <div className="space-y-3 bg-white p-4 rounded-xl border border-border/50">
-                  <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowHeatmap(!showHeatmap)}>
-                    <label className="text-sm font-medium cursor-pointer">Density Heatmap</label>
-                    <input type="checkbox" checked={showHeatmap} readOnly className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                  </div>
                   <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowPoints(!showPoints)}>
                     <label className="text-sm font-medium cursor-pointer">Citizen Report Points</label>
                     <input type="checkbox" checked={showPoints} readOnly className="w-4 h-4 rounded text-primary focus:ring-primary" />
