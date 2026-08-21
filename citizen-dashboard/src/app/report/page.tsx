@@ -130,8 +130,8 @@ export default function ReportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!otpSent || otp !== "1234") {
-      alert("Please verify your identity with the correct OTP (1234) before submitting.");
+    if (!isVerified) {
+      alert("Please log in to verify your identity before submitting.");
       return;
     }
 
@@ -148,8 +148,8 @@ export default function ReportPage() {
       longitude: mapLng,
       category: category || undefined,
       urgency: severity,
-      reporter_name: name || undefined,
-      reporter_phone: phone || undefined
+      citizen_name: name || undefined,
+      citizen_phone: phone || undefined
     };
 
     try {
