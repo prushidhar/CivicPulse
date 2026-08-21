@@ -15,8 +15,24 @@ export default function ReportPage() {
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
   const [severity, setSeverity] = useState("Low");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
   
+  useEffect(() => {
+    const authDataStr = localStorage.getItem("citizen_auth");
+    if (authDataStr) {
+      try {
+        const authData = JSON.parse(authDataStr);
+        if (authData.name) setName(authData.name);
+        if (authData.phone) setPhone(authData.phone);
+        if (authData.isVerified) setIsVerified(true);
+      } catch (e) {
+        console.error("Could not parse citizen_auth");
+      }
+    }
+  }, []);
+
   const [mapLat, setMapLat] = useState<number>(-23.5505); // Default to roughly Sao Paulo
   const [mapLng, setMapLng] = useState<number>(-46.6333);
   
@@ -126,7 +142,8 @@ export default function ReportPage() {
       longitude: mapLng,
       category: category || undefined,
       urgency: severity,
-      contact_email: email || undefined
+      reporter_name: name || undefined,
+      reporter_phone: phone || undefined
     };
 
     try {
@@ -337,16 +354,42 @@ export default function ReportPage() {
 
         {/* Privacy & Consent */}
         <div className="bg-surface p-8 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-8">
-          <div className="space-y-4">
-            <label className="block text-lg font-bold text-primary">{t("contactEmail")}</label>
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com" 
-              className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
-            />
-          </div>
+          
+          {isVerified ? (
+            <div className="bg-success/5 border border-success/20 p-6 rounded-2xl flex items-center justify-between">
+              <div>
+                <p className="text-success font-bold text-lg mb-1">Identity Verified</p>
+                <p className="text-success/70 font-medium text-sm">Reporting as: {name} ({phone})</p>
+              </div>
+              <CheckCircle2 className="w-8 h-8 text-success" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <label className="block text-lg font-bold text-primary">Full Name</label>
+                <input 
+                  type="text" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe" 
+                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
+                  required
+                />
+              </div>
+              <div className="space-y-4">
+                <label className="block text-lg font-bold text-primary">Phone Number</label>
+                <input 
+                  type="tel" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000" 
+                  className="w-full p-5 bg-background border-none rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold placeholder:text-primary/40" 
+                  required
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex items-start gap-4">
             <input type="checkbox" id="consent" required className="mt-1.5 w-5 h-5 text-primary rounded-md border-gray-300 focus:ring-primary cursor-pointer" />
             <label htmlFor="consent" className="text-primary/60 font-medium leading-relaxed cursor-pointer">
