@@ -138,9 +138,24 @@ export default function TrackPage() {
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">{t("problemSummary")}</h3>
                 <p className="text-primary font-medium text-lg bg-background p-6 rounded-3xl border border-gray-100/50">
-                  {trackData?.text || trackData?.description || "Loading description..."}
+                  {trackData?.original_text || trackData?.description || "Loading description..."}
                 </p>
               </div>
+              
+              {trackData?.transcript && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold text-purple-600/70 uppercase tracking-widest flex items-center gap-2">
+                    <svg className="w-4 h-4 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    AI Official Assessment
+                  </h3>
+                  <div className="text-purple-900 font-medium text-lg bg-purple-50 p-6 rounded-3xl border border-purple-100/50">
+                    <p className="mb-4"><strong>Summary:</strong> {trackData.transcript.includes('AI Summary:') ? trackData.transcript.split('AI Summary:')[1]?.split('\n\nRecommended Action:')[0]?.trim() : trackData.transcript}</p>
+                    {trackData.transcript.includes('Recommended Action:') && (
+                      <p><strong>Recommended Gov Action:</strong> {trackData.transcript.split('Recommended Action:')[1]?.trim()}</p>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-3">

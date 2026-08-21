@@ -41,12 +41,17 @@ async def upload_media(
     db.add(media)
     db.commit()
     
-    # If it's audio, run ASR and append to transcript
+    # If it's audio, run Gemini ASR and append to original_text if empty
     if file.content_type and "audio" in file.content_type:
-        result = asr_provider.transcribe(local_path)
-        req.transcript = result["text"]
-        req.language = result["language"]
-        req.original_text = result["text"] # Fallback if text wasn't provided
-        db.commit()
+        from app.ai.classification.gemini_adapter import transcribe_audio_with_gemini
+        with open(local_path, "rb") as f:
+            audio_bytes = f.read()
+            
+        transcription = transcribe_audio_with_gemini(audio_bytes, file.content_type)
+        if transcription:
+            if not req.original_text:
+                req.original_text = transcription
+            # We don't overwrite req.transcript because that holds the Gemini AI Summary!
+            db.commit()
         
     return {"status": "success", "media_id": str(media.media_id)}
