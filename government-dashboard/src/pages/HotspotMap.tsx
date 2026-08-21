@@ -1,10 +1,27 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import Map, { Source, Layer, NavigationControl, GeolocateControl, Marker } from 'react-map-gl/maplibre';
-import 'maplibre-gl/dist/maplibre-gl.css';
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Layers, MapPin, Globe, AlertTriangle } from 'lucide-react';
 import { api } from '@/lib/api';
+
+const HeatmapLayer = ({ data, visible }: { data: any[], visible: boolean }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map || !(window as any).google) return;
+    const heatmap = new (window as any).google.maps.visualization.HeatmapLayer({
+      data: data.map(pt => ({
+        location: new (window as any).google.maps.LatLng(pt.latitude, pt.longitude),
+        weight: pt.weight
+      })),
+      radius: 20,
+      opacity: 0.8
+    });
+    heatmap.setMap(visible ? map : null);
+    return () => heatmap.setMap(null);
+  }, [map, data, visible]);
+  return null;
+};
 
 export default function HotspotMap() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -13,9 +30,7 @@ export default function HotspotMap() {
   const [showPoints, setShowPoints] = useState(true);
 
   useEffect(() => {
-    // Fetch live requests from the backend
     api.getRequests().then(data => {
-      // Filter out requests without coordinates
       const valid = (Array.isArray(data) ? data : data.items || []).filter(
         (r: any) => r.latitude && r.longitude
       );
@@ -23,103 +38,53 @@ export default function HotspotMap() {
     }).catch(console.error);
   }, []);
 
-  const geojson = useMemo(() => {
-    return {
-      type: 'FeatureCollection',
-      features: requests.map(r => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [r.longitude, r.latitude]
-        },
-        properties: {
-          ...r,
-          weight: r.severity === 'high' || r.severity === 'critical' ? 1.0 : r.severity === 'medium' ? 0.6 : 0.2
-        }
-      }))
-    };
+  const heatmapData = useMemo(() => {
+    return requests.map(r => ({
+      ...r,
+      weight: r.severity === 'high' || r.severity === 'critical' ? 1.0 : r.severity === 'medium' ? 0.6 : 0.2
+    }));
   }, [requests]);
+
+  const getColor = (severity: string) => {
+    switch(severity) {
+      case 'critical': return '#dc2626';
+      case 'high': return '#ef4444';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#10b981';
+      default: return '#6b7280';
+    }
+  };
 
   return (
     <div className="flex h-full w-full relative">
-      {/* MapLibre Area */}
       <div className="flex-1 h-full w-full relative bg-[#eef1f4]">
-        <Map
-          initialViewState={{
-            longitude: 77.2090, // Center on India
-            latitude: 28.6139,
-            zoom: 4.5
-          }}
-          mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-          interactiveLayerIds={['report-points']}
-          onClick={(e) => {
-            if (e.features && e.features.length > 0) {
-              setSelectedReport(e.features[0].properties);
-            } else {
-              setSelectedReport(null);
-            }
-          }}
-          cursor="pointer"
-        >
-          <NavigationControl position="top-left" />
-          <GeolocateControl position="top-left" />
-          
-          <Source id="reports" type="geojson" data={geojson as any}>
-            {/* Heatmap Layer */}
-            {showHeatmap && (
-              <Layer
-                id="report-heatmap"
-                type="heatmap"
-                paint={{
-                  'heatmap-weight': ['get', 'weight'],
-                  'heatmap-intensity': 1,
-                  'heatmap-color': [
-                    'interpolate',
-                    ['linear'],
-                    ['heatmap-density'],
-                    0, 'rgba(33,102,172,0)',
-                    0.2, 'rgb(103,169,207)',
-                    0.4, 'rgb(209,229,240)',
-                    0.6, 'rgb(253,219,199)',
-                    0.8, 'rgb(239,138,98)',
-                    1, 'rgb(178,24,43)'
-                  ],
-                  'heatmap-radius': [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    0, 2,
-                    9, 20
-                  ],
-                  'heatmap-opacity': 0.8
-                }}
-              />
-            )}
+        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''} libraries={['visualization']}>
+          <Map
+            defaultCenter={{ lat: 28.6139, lng: 77.2090 }}
+            defaultZoom={4.5}
+            mapId="DEMO_MAP_ID"
+            disableDefaultUI={true}
+            zoomControl={true}
+          >
+            <HeatmapLayer data={heatmapData} visible={showHeatmap} />
             
-            {/* Points Layer */}
-            {showPoints && (
-              <Layer
-                id="report-points"
-                type="circle"
-                paint={{
-                  'circle-radius': 6,
-                  'circle-color': [
-                    'match',
-                    ['get', 'severity'],
-                    'critical', '#dc2626',
-                    'high', '#ef4444',
-                    'medium', '#f59e0b',
-                    'low', '#10b981',
-                    /* other */ '#6b7280'
-                  ],
-                  'circle-stroke-color': '#ffffff',
-                  'circle-stroke-width': 2,
-                  'circle-opacity': showHeatmap ? 0.7 : 1
-                }}
-              />
-            )}
-          </Source>
-        </Map>
+            {showPoints && requests.map((r, i) => (
+              <AdvancedMarker 
+                key={i}
+                position={{ lat: r.latitude, lng: r.longitude }}
+                onClick={() => setSelectedReport(r)}
+              >
+                <div style={{
+                  width: '12px', height: '12px', borderRadius: '50%',
+                  backgroundColor: getColor(r.severity),
+                  border: '2px solid white',
+                  boxShadow: '0 0 4px rgba(0,0,0,0.3)',
+                  opacity: showHeatmap ? 0.7 : 1
+                }} />
+              </AdvancedMarker>
+            ))}
+          </Map>
+        </APIProvider>
         
         {/* Layer Toggles Panel */}
         <div className="absolute top-4 right-4 z-10 w-64 bg-white/95 backdrop-blur shadow-lg p-4 rounded-xl border border-border/50">

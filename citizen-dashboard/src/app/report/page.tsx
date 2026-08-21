@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useRouter } from "next/navigation";
 import maplibregl from "maplibre-gl";
+import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 
 export default function ReportPage() {
   const router = useRouter();
@@ -46,12 +47,8 @@ export default function ReportPage() {
     }
   }, [router]);
 
-  const [mapLat, setMapLat] = useState<number>(-23.5505); // Default to roughly Sao Paulo
-  const [mapLng, setMapLng] = useState<number>(-46.6333);
-  
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const markerRef = useRef<maplibregl.Marker | null>(null);
+  const [mapLat, setMapLat] = useState<number>(28.6139); // Default to New Delhi
+  const [mapLng, setMapLng] = useState<number>(77.2090);
 
   // Audio recording states
   const [recording, setRecording] = useState(false);
@@ -60,47 +57,12 @@ export default function ReportPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  useEffect(() => {
-    if (!mapContainerRef.current || step !== "form") return;
-
-    mapRef.current = new maplibregl.Map({
-      container: mapContainerRef.current,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-      center: [mapLng, mapLat],
-      zoom: 12
-    });
-
-    markerRef.current = new maplibregl.Marker({ draggable: true })
-      .setLngLat([mapLng, mapLat])
-      .addTo(mapRef.current);
-
-    markerRef.current.on("dragend", () => {
-      const lngLat = markerRef.current?.getLngLat();
-      if (lngLat) {
-        setMapLat(lngLat.lat);
-        setMapLng(lngLat.lng);
-      }
-    });
-
-    mapRef.current.on("click", (e) => {
-      markerRef.current?.setLngLat(e.lngLat);
-      setMapLat(e.lngLat.lat);
-      setMapLng(e.lngLat.lng);
-    });
-
-    return () => {
-      mapRef.current?.remove();
-    };
-  }, [step]); // re-init if they somehow go back to form
-
   const handleUseMyLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
         setMapLat(latitude);
         setMapLng(longitude);
-        mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 14 });
-        markerRef.current?.setLngLat([longitude, latitude]);
       }, (err) => {
         console.error("Location error:", err);
         alert("Could not get your location. Please check permissions.");
@@ -345,11 +307,35 @@ export default function ReportPage() {
               <MapPin className="w-4 h-4" /> {t("useMyLocation")}
             </button>
           </div>
-          <div className="w-full h-[300px] bg-background rounded-[2rem] overflow-hidden relative border border-gray-100/50">
-            <div ref={mapContainerRef} className="absolute inset-0"></div>
-          </div>
-          <div className="text-center text-primary/50 font-bold text-sm bg-background py-3 rounded-2xl border border-gray-100">
-             Lat: {mapLat.toFixed(4)} | Lng: {mapLng.toFixed(4)}
+          <div className="relative w-full h-[300px] bg-muted/20 rounded-2xl overflow-hidden border border-border/50">
+            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
+              <Map
+                defaultCenter={{ lat: mapLat, lng: mapLng }}
+                defaultZoom={12}
+                mapId="DEMO_MAP_ID"
+                onClick={(e) => {
+                  if (e.detail.latLng) {
+                    setMapLat(e.detail.latLng.lat);
+                    setMapLng(e.detail.latLng.lng);
+                  }
+                }}
+              >
+                <AdvancedMarker 
+                  position={{ lat: mapLat, lng: mapLng }} 
+                  draggable={true}
+                  onDragEnd={(e) => {
+                    if (e.latLng) {
+                      setMapLat(e.latLng.lat());
+                      setMapLng(e.latLng.lng());
+                    }
+                  }}
+                />
+              </Map>
+            </APIProvider>
+            
+            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm text-xs font-mono font-bold text-primary">
+              Lat: {mapLat.toFixed(4)} | Lng: {mapLng.toFixed(4)}
+            </div>
           </div>
         </div>
 

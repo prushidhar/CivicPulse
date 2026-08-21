@@ -76,7 +76,12 @@ export default function Dashboard() {
           <p className="text-muted-foreground mt-1">Live metrics generated from actual citizen reports.</p>
         </div>
         <div className="flex space-x-3">
-          <button className="px-4 py-2 bg-white border border-border/50 shadow-sm rounded-xl text-sm font-medium hover:bg-muted/50 transition-colors">
+          <button 
+            onClick={() => {
+              alert('Generating comprehensive PDF report... (Demo Mode)');
+            }}
+            className="px-4 py-2 bg-white border border-border/50 shadow-sm rounded-xl text-sm font-medium hover:bg-muted/50 transition-colors"
+          >
             Export Report
           </button>
         </div>
