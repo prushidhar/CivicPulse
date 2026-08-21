@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Activity, AlertTriangle, FileCheck, Target, MessageSquare, Bot, Clock, Zap, Map } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
+import { APIProvider, Map as GoogleMap, AdvancedMarker } from '@vis.gl/react-google-maps';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -204,9 +205,28 @@ export default function Dashboard() {
             <CardTitle>Report Geography</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <div className="h-[250px] w-full bg-muted/20 flex flex-col items-center justify-center text-muted-foreground rounded-xl border border-dashed border-border/60">
-              <Map className="w-8 h-8 mb-2 opacity-50" />
-              <p className="text-sm font-medium">Regional Distribution Map Loading</p>
+            <div className="h-[300px] w-full rounded-xl overflow-hidden border border-border/60">
+              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
+                <GoogleMap
+                  defaultCenter={{ lat: 28.6139, lng: 77.2090 }}
+                  defaultZoom={4}
+                  mapId="DEMO_MAP_ID"
+                  disableDefaultUI={true}
+                >
+                  {stats.recentRequests && stats.recentRequests.map((r: any, i: number) => (
+                    r.latitude && r.longitude && (
+                      <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
+                        <div style={{
+                          width: '10px', height: '10px', borderRadius: '50%',
+                          backgroundColor: r.severity === 'critical' ? '#ef4444' : r.severity === 'high' ? '#f97316' : '#3b82f6',
+                          border: '2px solid white',
+                          boxShadow: '0 0 4px rgba(0,0,0,0.3)'
+                        }} />
+                      </AdvancedMarker>
+                    )
+                  ))}
+                </GoogleMap>
+              </APIProvider>
             </div>
           </CardContent>
         </Card>
