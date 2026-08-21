@@ -56,7 +56,7 @@ def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/web
     """Uses Gemini multimodal to transcribe audio from citizen voice reports."""
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        audio_part = {"mime_type": mime_type, "data": audio_bytes}
+        audio_part = {"mime_type": mime_type.split(";")[0].strip() if mime_type else "audio/webm", "data": audio_bytes}
         response = model.generate_content([
             "Please accurately transcribe this audio. Return ONLY the transcription text, nothing else.",
             audio_part
