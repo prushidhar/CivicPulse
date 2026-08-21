@@ -21,11 +21,11 @@ export default function HotspotMap() {
 
   const getColor = (severity: string) => {
     switch(severity) {
-      case 'critical': return '#dc2626';
-      case 'high': return '#ef4444';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
+      case 'critical': return '#EA4335';
+      case 'high': return '#EA4335';
+      case 'medium': return '#FBBC04';
+      case 'low': return '#34A853';
+      default: return '#4285F4';
     }
   };
 

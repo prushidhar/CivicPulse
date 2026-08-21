@@ -81,23 +81,24 @@ export default function Recommendations() {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full bg-[#f8f9fa]">
       {/* Left List */}
-      <div className="w-1/3 border-r border-border bg-muted/20 overflow-y-auto">
-        <div className="p-4 border-b border-border bg-background sticky top-0 z-10">
-          <h2 className="text-lg font-bold">Priority Engine</h2>
-          <p className="text-xs text-muted-foreground">Automated intervention proposals</p>
+      <div className="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
+        <div className="p-6 border-b border-gray-100 bg-white sticky top-0 z-10 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#FBBC04]/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 relative z-10">Priority Engine</h2>
+          <p className="text-sm text-gray-500 font-medium relative z-10">AI-generated intervention proposals</p>
         </div>
-        <div className="p-2 space-y-2">
+        <div className="p-4 space-y-3">
           {recommendations.map(rec => (
             <div 
               key={rec.id} 
               onClick={() => handleSelectRec(rec)}
-              className={`p-4 rounded-lg border cursor-pointer transition-colors ${selectedRec?.id === rec.id ? 'bg-primary/5 border-primary' : 'bg-background hover:bg-muted border-border'}`}
+              className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${selectedRec?.id === rec.id ? 'bg-[#4285F4]/5 border-[#4285F4] shadow-sm' : 'bg-white hover:bg-gray-50 border-gray-100 hover:border-gray-200'}`}
             >
-              <div className="flex justify-between items-start mb-2">
-                <span className="font-semibold text-sm">{rec.id}</span>
-                <Badge variant={rec.priorityScore >= 80 ? 'destructive' : 'warning'}>{rec.priorityScore} / 100</Badge>
+              <div className="flex justify-between items-start mb-3">
+                <span className="font-bold text-sm text-gray-800">{rec.id}</span>
+                <Badge variant={rec.priorityScore >= 80 ? 'destructive' : 'warning'} className="shadow-sm">Score: {rec.priorityScore}</Badge>
               </div>
               <h3 className="text-sm font-medium leading-tight mb-2">{rec.title}</h3>
               <div className="flex items-center text-xs text-muted-foreground">

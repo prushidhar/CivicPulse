@@ -68,15 +68,21 @@ export default function CitizenRequests() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Citizen Reports (Live Data)</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            <Brain className="inline w-4 h-4 mr-1 text-purple-500" />
-            Powered by <strong>Google Gemini AI</strong> — click any row to see AI analysis
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100/50 mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#4285F4]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#EA4335]/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
+        
+        <div className="relative z-10 mb-4 md:mb-0">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
+            Citizen Reports
+            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">Live</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-2 font-medium flex items-center">
+            <Brain className="inline w-4 h-4 mr-1.5 text-[#4285F4]" />
+            Analyzed, Translated, and Routed by <span className="font-bold text-gray-800 ml-1">Google Gemini 1.5</span>
           </p>
         </div>
-        <div className="flex space-x-3 items-center">
+        <div className="flex space-x-3 items-center relative z-10">
           <select 
             className="px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary font-medium"
             value={filterDepartment}
@@ -251,9 +257,9 @@ export default function CitizenRequests() {
                             {r.media && r.media.length > 0 ? (
                               r.media.map((m, idx) => (
                                 <div key={idx} className="border border-border rounded overflow-hidden">
-                                  {m.type.includes('image') ? (
+                                  {(m.type || '').includes('image') ? (
                                     <img src={m.url} alt="Evidence" className="h-48 object-cover max-w-full" />
-                                  ) : m.type.includes('audio') ? (
+                                  ) : (m.type || '').includes('audio') ? (
                                     <div className="p-3 bg-muted">
                                       <audio src={m.url} controls className="h-10" />
                                     </div>

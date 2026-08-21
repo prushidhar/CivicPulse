@@ -98,14 +98,14 @@ export default function Dashboard() {
       {/* Citizen Report Metrics */}
       <div>
         <h2 className="text-lg font-bold mb-4 flex items-center">
-          <MessageSquare className="w-5 h-5 mr-2 text-primary" />
+          <MessageSquare className="w-5 h-5 mr-2 text-[#4285F4]" />
           Citizen Reporting Metrics
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/10">
+          <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-[#34A853]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-500">
+                <div className="w-10 h-10 rounded-full bg-[#34A853]/10 flex items-center justify-center shadow-sm text-[#34A853]">
                   <Target className="w-5 h-5" />
                 </div>
               </div>
@@ -114,10 +114,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-[#EA4335]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                <div className="w-10 h-10 rounded-full bg-[#EA4335]/10 flex items-center justify-center text-[#EA4335]">
                   <AlertTriangle className="w-5 h-5" />
                 </div>
               </div>
@@ -126,10 +126,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-[#4285F4]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                <div className="w-10 h-10 rounded-full bg-[#4285F4]/10 flex items-center justify-center text-[#4285F4]">
                   <FileCheck className="w-5 h-5" />
                 </div>
               </div>
@@ -145,13 +145,13 @@ export default function Dashboard() {
       {/* Field Operations Metrics */}
       <div>
         <h2 className="text-lg font-bold mb-4 flex items-center">
-          <Zap className="w-5 h-5 mr-2 text-orange-500" />
+          <Zap className="w-5 h-5 mr-2 text-[#FBBC04]" />
           Field Operations
         </h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-sm transition-shadow">
             <CardContent className="p-5 flex items-center space-x-4">
-              <div className="p-3 bg-red-50 text-red-500 rounded-xl">
+              <div className="p-3 bg-[#EA4335]/10 text-[#EA4335] rounded-xl">
                 <AlertTriangle className="h-6 w-6" />
               </div>
               <div>
@@ -161,9 +161,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-sm transition-shadow">
             <CardContent className="p-5 flex items-center space-x-4">
-              <div className="p-3 bg-primary/10 text-primary rounded-xl">
+              <div className="p-3 bg-[#4285F4]/10 text-[#4285F4] rounded-xl">
                 <Target className="h-6 w-6" />
               </div>
               <div>
@@ -173,9 +173,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-sm transition-shadow">
             <CardContent className="p-5 flex items-center space-x-4">
-              <div className="p-3 bg-yellow-50 text-yellow-600 rounded-xl">
+              <div className="p-3 bg-[#FBBC04]/10 text-[#FBBC04] rounded-xl">
                 <FileCheck className="h-6 w-6" />
               </div>
               <div>
@@ -185,9 +185,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-white hover:shadow-sm transition-shadow">
             <CardContent className="p-5 flex items-center space-x-4">
-              <div className="p-3 bg-green-50 text-green-500 rounded-xl">
+              <div className="p-3 bg-[#34A853]/10 text-[#34A853] rounded-xl">
                 <Activity className="h-6 w-6" />
               </div>
               <div>
