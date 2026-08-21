@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Shell from './components/layout/Shell';
 
 import Dashboard from './pages/Dashboard';
@@ -8,11 +8,25 @@ import CitizenRequests from './pages/CitizenRequests';
 import Recommendations from './pages/Recommendations';
 import Infrastructure from './pages/Infrastructure';
 import AuditConsole from './pages/AuditConsole';
+import Login from './pages/Login';
+
+// Protected Route Wrapper
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Shell />}>
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<ProtectedRoute><Shell /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="map" element={<HotspotMap />} />

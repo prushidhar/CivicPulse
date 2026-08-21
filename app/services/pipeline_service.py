@@ -33,7 +33,10 @@ class RequestPipeline:
         classification = classify_with_gemini(req.pii_redacted_text)
         req.category = classification.get('category', 'other')
         req.intent = classification.get('intent', 'unknown')
-        req.severity = classification.get('severity', 'medium')
+        # Only set severity if it's currently missing/Pending
+        if not req.severity or req.severity.lower() == 'pending':
+            req.severity = classification.get('severity', 'medium')
+        
         req.urgency = classification.get('urgency', 3)
         req.ai_confidence = classification.get('confidence', 0.8)
         

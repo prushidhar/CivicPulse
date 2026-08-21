@@ -15,8 +15,14 @@ export default function Dashboard() {
       api.getImpact().catch(() => ({ estimatedPopulationReached: 0 })),
       api.getRequests ? api.getRequests().catch(() => []) : Promise.resolve([])
     ]).then(([hotspots, recommendations, impact, requests]) => {
-      const openReqs = requests.filter((r: any) => r.status === 'open' || r.status === 'pending').length;
-      const closedReqs = requests.filter((r: any) => r.status === 'closed' || r.status === 'resolved').length;
+      const openReqs = requests.filter((r: any) => {
+        const s = (r.status || '').toLowerCase();
+        return s === 'open' || s === 'pending' || s === 'processing' || s === 'accepted';
+      }).length;
+      const closedReqs = requests.filter((r: any) => {
+        const s = (r.status || '').toLowerCase();
+        return s === 'closed' || s === 'resolved' || s === 'rejected';
+      }).length;
       const totalReqs = requests.length || 1; // avoid division by zero
       
       setStats({
