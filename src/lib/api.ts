@@ -1,9 +1,9 @@
 // API Client for CivicPulse BRICS
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+const BASE_URL = "/api/v1"; // HARDCODED TO FORCE VERCEL PROXY AND IGNORE MIXED CONTENT ENV VARS
 
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
-  const token = localStorage.getItem("token"); // Or however you store the JWT
+  const token = localStorage.getItem("token"); 
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -14,13 +14,16 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     headers["Authorization"] = `Bearer ${token}`;
   }
   
-  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
-  
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}${endpoint.includes("?") ? "&" : "?"}t=${Date.now()}`, { ...options, headers });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("API request failed:", error);
+    throw error;
   }
-  
-  return response.json();
 }
 
 export type Hotspot = {
@@ -41,14 +44,14 @@ export type Recommendation = {
   description: string;
   status: 'pending' | 'accepted' | 'rejected' | 'edited';
   scores: {
-    demandIntensity: number; // 25%
-    infrastructureGap: number; // 20%
-    vulnerability: number; // 15%
-    affectedPopulation: number; // 10%
-    urgencyRisk: number; // 10%
-    trendAcceleration: number; // 10%
-    feasibility: number; // 5%
-    equityAdjustment: number; // 5%
+    demandIntensity: number;
+    infrastructureGap: number;
+    vulnerability: number;
+    affectedPopulation: number;
+    urgencyRisk: number;
+    trendAcceleration: number;
+    feasibility: number;
+    equityAdjustment: number;
   };
 };
 
@@ -70,50 +73,17 @@ export type AuditLog = {
 };
 
 export const api = {
-  getHotspots: async (): Promise<Hotspot[]> => {
-    return fetchWithAuth('/hotspots');
-  },
-
-  getGeoUnit: async (id: string) => {
-    return fetchWithAuth(`/geo/units/${id}`);
-  },
-
-  getIndicators: async () => {
-    return fetchWithAuth('/indicators');
-  },
-
-  getInfrastructure: async () => {
-    return fetchWithAuth('/infrastructure');
-  },
-
-  getProjects: async () => {
-    return fetchWithAuth('/projects');
-  },
-
-  getRecommendations: async (): Promise<Recommendation[]> => {
-    return fetchWithAuth('/recommendations');
-  },
-
-  getEvidence: async (id: string): Promise<Evidence[]> => {
-    return fetchWithAuth(`/recommendations/${id}/evidence`);
-  },
-
-  decideRecommendation: async (id: string, decision: 'accepted' | 'rejected' | 'edited', reason: string) => {
-    return fetchWithAuth(`/recommendations/${id}/decision`, {
-      method: 'POST',
-      body: JSON.stringify({ decision, reason })
-    });
-  },
-
-  getImpact: async () => {
-    return fetchWithAuth('/impact');
-  },
-
-  getDatasets: async () => {
-    return fetchWithAuth('/datasets');
-  },
-
-  getAudit: async (objectId: string): Promise<AuditLog[]> => {
-    return fetchWithAuth(`/audit/${objectId}`);
-  }
+  getHotspots: async (): Promise<Hotspot[]> => fetchWithAuth('/hotspots'),
+  getRequests: async () => fetchWithAuth('/requests'),
+  updateRequestStatus: async (id: string, status: string) => fetchWithAuth('/requests/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getGeoUnit: async (id: string) => fetchWithAuth(`/geo/units/${id}`),
+  getIndicators: async () => fetchWithAuth('/indicators'),
+  getInfrastructure: async () => fetchWithAuth('/infrastructure'),
+  getProjects: async () => fetchWithAuth('/projects'),
+  getRecommendations: async (): Promise<Recommendation[]> => fetchWithAuth('/recommendations'),
+  getEvidence: async (id: string): Promise<Evidence[]> => fetchWithAuth(`/recommendations/${id}/evidence`),
+  decideRecommendation: async (id: string, decision: 'accepted' | 'rejected' | 'edited', reason: string) => fetchWithAuth(`/recommendations/${id}/decision`, { method: 'POST', body: JSON.stringify({ decision, reason }) }),
+  getImpact: async () => fetchWithAuth('/impact'),
+  getDatasets: async () => fetchWithAuth('/datasets'),
+  getAudit: async (objectId: string): Promise<AuditLog[]> => fetchWithAuth(`/audit/${objectId}`)
 };
