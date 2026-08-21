@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { Mic, MapPin, CheckCircle2, Loader2, ArrowRight, Square } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useRouter } from "next/navigation";
 import maplibregl from "maplibre-gl";
 
 export default function ReportPage() {
+  const router = useRouter();
   const { t } = useLanguage();
   const [step, setStep] = useState<"form" | "processing" | "success">("form");
   const [progress, setProgress] = useState(0);
@@ -18,20 +20,29 @@ export default function ReportPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isVerified, setIsVerified] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   
   useEffect(() => {
     const authDataStr = localStorage.getItem("citizen_auth");
-    if (authDataStr) {
-      try {
-        const authData = JSON.parse(authDataStr);
-        if (authData.name) setName(authData.name);
-        if (authData.phone) setPhone(authData.phone);
-        if (authData.isVerified) setIsVerified(true);
-      } catch (e) {
-        console.error("Could not parse citizen_auth");
-      }
+    if (!authDataStr) {
+      router.push("/login?redirect=/report");
+      return;
     }
-  }, []);
+    try {
+      const authData = JSON.parse(authDataStr);
+      if (!authData.isVerified) {
+        router.push("/login?redirect=/report");
+        return;
+      }
+      if (authData.name) setName(authData.name);
+      if (authData.phone) setPhone(authData.phone);
+      setIsVerified(true);
+      setAuthChecked(true);
+    } catch (e) {
+      console.error("Could not parse citizen_auth");
+      router.push("/login?redirect=/report");
+    }
+  }, [router]);
 
   const [mapLat, setMapLat] = useState<number>(-23.5505); // Default to roughly Sao Paulo
   const [mapLng, setMapLng] = useState<number>(-46.6333);
@@ -202,6 +213,8 @@ export default function ReportPage() {
       setTimeout(() => setStep("success"), 500);
     }
   };
+
+  if (!authChecked) return null;
 
   if (step === "processing") {
     return (
