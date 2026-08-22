@@ -56,25 +56,30 @@ async def upload_media(
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
         
-    ext = file.filename.split('.')[-1]
+    ext = file.filename.split('.')[-1] if '.' in file.filename else "bin"
     file_uuid = uuid.uuid4()
     
     os.makedirs("/tmp/civicpulse_media", exist_ok=True)
     local_path = f"/tmp/civicpulse_media/{file_uuid}.{ext}"
     
+    file_bytes = await file.read()
+    
     with open(local_path, "wb") as f:
-        f.write(await file.read())
+        f.write(file_bytes)
+        
+    import base64
+    b64_data = base64.b64encode(file_bytes).decode('utf-8')
         
     media = RequestMedia(
         request_id=req.request_id,
-        object_key=local_path,
+        object_key=f"base64:{b64_data}",
         media_type=file.content_type,
         scan_status="clean"
     )
     db.add(media)
     db.commit()
     
-    background_tasks.add_task(process_media_background, str(req.request_id), local_path, file.content_type)
+    background_tasks.add_task(process_media_background, request_id, local_path, file.content_type)
     
     return {"status": "success", "media_id": str(media.media_id)}
 
@@ -84,6 +89,12 @@ def download_media(media_id: str, db: Session = Depends(get_db)):
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
     
+    if media.object_key and media.object_key.startswith("base64:"):
+        import base64
+        from fastapi.responses import Response
+        file_bytes = base64.b64decode(media.object_key[7:])
+        return Response(content=file_bytes, media_type=media.media_type)
+        
     from fastapi.responses import FileResponse
     if not os.path.exists(media.object_key):
         raise HTTPException(status_code=404, detail="File missing on disk")
