@@ -47,8 +47,8 @@ def create_request(
     db.commit()
     db.refresh(new_request)
     
-    # Run Gemini AI pipeline synchronously for Vercel serverless compatibility
-    run_pipeline_background(str(new_request.request_id))
+    # Run Gemini AI pipeline in background (GCP VM supports true background tasks)
+    background_tasks.add_task(run_pipeline_background, str(new_request.request_id))
     
     return CitizenRequestResponse(
         request_id=new_request.request_id,
