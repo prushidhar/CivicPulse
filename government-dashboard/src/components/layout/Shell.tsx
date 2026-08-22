@@ -128,7 +128,15 @@ export default function Shell() {
               />
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 md:space-x-4">
+            <a 
+              href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-citizen.vercel.app"} 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
+            >
+              Citizen Portal &rarr;
+            </a>
             <button 
               onClick={() => alert("3 new AI recommendations require review.")}
               className="relative p-2.5 text-muted-foreground bg-white border border-border/50 shadow-sm hover:shadow-md rounded-xl transition-all"
