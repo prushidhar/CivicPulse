@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
 import { ChevronDown, ChevronUp, Brain, Zap, FileText } from 'lucide-react';
 
 export default function CitizenRequests() {
+  const context = useOutletContext<{ globalSearch: string }>();
+  const globalSearch = context?.globalSearch || '';
+
   const [requests, setRequests] = useState<any[] | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterDepartment, setFilterDepartment] = useState<string>('All');
@@ -43,11 +47,27 @@ export default function CitizenRequests() {
   };
 
   const filteredRequests = requests?.filter(r => {
-    if (filterDepartment === 'All') return true;
-    const aiDept = r.transcript && r.transcript.includes('Assigned Department:') 
-      ? r.transcript.split('Assigned Department:')[1]?.split('\n')[0]?.trim() 
-      : 'Unassigned';
-    return aiDept === filterDepartment;
+    // Department Filter Logic (Fuzzy match to handle Gemini string variations)
+    let matchesDept = true;
+    if (filterDepartment !== 'All') {
+      const aiDept = r.transcript && r.transcript.includes('Assigned Department:') 
+        ? r.transcript.split('Assigned Department:')[1]?.split('\n')[0]?.trim().toLowerCase() 
+        : 'unassigned';
+      matchesDept = aiDept.includes(filterDepartment.toLowerCase());
+    }
+
+    // Global Search Logic
+    let matchesSearch = true;
+    if (globalSearch.trim() !== '') {
+      const s = globalSearch.toLowerCase();
+      matchesSearch = 
+        (r.request_id && r.request_id.toLowerCase().includes(s)) ||
+        (r.category && r.category.toLowerCase().includes(s)) ||
+        (r.original_text && r.original_text.toLowerCase().includes(s)) ||
+        (r.transcript && r.transcript.toLowerCase().includes(s));
+    }
+
+    return matchesDept && matchesSearch;
   });
 
   if (!requests) {

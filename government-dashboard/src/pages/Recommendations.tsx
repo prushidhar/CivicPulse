@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api, type Recommendation, type Evidence } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -6,11 +7,13 @@ import { Badge } from '@/components/ui/Badge';
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 
 export default function Recommendations() {
+  const context = useOutletContext<{ globalSearch: string }>();
+  const globalSearch = context?.globalSearch || '';
+
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [selectedRec, setSelectedRec] = useState<Recommendation | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [decisionReason, setDecisionReason] = useState('');
-
   const [error, setError] = useState<string | null>(null);
 
   const fetchRecs = () => {
@@ -27,6 +30,17 @@ export default function Recommendations() {
         setRecommendations([]);
       });
   };
+
+  const filteredRecs = recommendations.filter(r => {
+    if (!globalSearch.trim()) return true;
+    const s = globalSearch.toLowerCase();
+    return (
+      (r.title && r.title.toLowerCase().includes(s)) ||
+      (r.description && r.description.toLowerCase().includes(s)) ||
+      (r.status && r.status.toLowerCase().includes(s)) ||
+      (r.id && r.id.toLowerCase().includes(s))
+    );
+  });
 
   useEffect(() => {
     fetchRecs();
@@ -90,7 +104,7 @@ export default function Recommendations() {
           <p className="text-sm text-gray-500 font-medium relative z-10">AI-generated intervention proposals</p>
         </div>
         <div className="p-4 space-y-3">
-          {recommendations.map(rec => (
+          {filteredRecs.map(rec => (
             <div 
               key={rec.id} 
               onClick={() => handleSelectRec(rec)}
