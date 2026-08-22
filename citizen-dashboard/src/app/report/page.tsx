@@ -200,27 +200,39 @@ export default function ReportPage() {
 
   if (step === "processing") {
     return (
-      <div className="max-w-2xl mx-auto py-24 px-4 flex flex-col items-center justify-center space-y-12 text-center animate-in fade-in zoom-in-95 relative">
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-[#4285F4]/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="max-w-2xl mx-auto py-16 px-4 flex flex-col items-center justify-center space-y-12 text-center animate-in fade-in zoom-in-95 relative">
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-[#4285F4]/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
         
-        <div className="relative z-10 flex flex-col items-center space-y-6">
-          <Loader2 className="w-20 h-20 text-[#4285F4] animate-spin drop-shadow-md" />
-          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Processing with Google AI...</h2>
-        </div>
-        
-        <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner relative z-10">
-          <div className="h-full rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#FBBC04]" style={{ width: `${progress}%` }}></div>
-        </div>
-
-        <div className="flex flex-col gap-5 text-sm font-bold w-full max-w-sm text-left relative z-10 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div className={`flex items-center gap-3 transition-colors ${progress >= 30 ? "text-[#34A853]" : "text-gray-300"}`}>
-            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Uploading Media Evidence</span>
+        <div className="relative z-10 w-full bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+          <div className="bg-gray-800 px-6 py-4 flex items-center justify-between border-b border-gray-700">
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 text-[#4285F4] animate-spin" />
+              <span className="text-xs font-mono text-gray-400 font-bold tracking-widest uppercase">Gemini Multimodal Engine</span>
+            </div>
           </div>
-          <div className={`flex items-center gap-3 transition-colors ${progress >= 60 ? "text-[#34A853]" : "text-gray-300"}`}>
-            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Gemini Vision Analysis</span>
+          
+          <div className="p-8 text-left space-y-6 font-mono">
+            <div className={`flex items-center gap-4 transition-all duration-500 ${progress >= 30 ? "text-[#34A853]" : "text-gray-500"}`}>
+              {progress >= 30 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" />}
+              <span className="text-sm md:text-base">> Initializing secure government connection...</span>
+            </div>
+            <div className={`flex items-center gap-4 transition-all duration-500 delay-300 ${progress >= 60 ? "text-[#34A853]" : progress >= 30 ? "text-[#4285F4]" : "text-gray-700"}`}>
+              {progress >= 60 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : progress >= 30 ? <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-700 flex-shrink-0"></div>}
+              <span className="text-sm md:text-base">> Parsing citizen media & extracting geospatial context...</span>
+            </div>
+            <div className={`flex items-center gap-4 transition-all duration-500 delay-500 ${progress >= 100 ? "text-[#34A853]" : progress >= 60 ? "text-[#4285F4]" : "text-gray-700"}`}>
+              {progress >= 100 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : progress >= 60 ? <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-700 flex-shrink-0"></div>}
+              <span className="text-sm md:text-base">> Structuring AI summary & routing to official dashboard...</span>
+            </div>
           </div>
-          <div className={`flex items-center gap-3 transition-colors ${progress >= 100 ? "text-[#34A853]" : "text-gray-300"}`}>
-            <CheckCircle2 className="w-6 h-6" /> <span className="text-base text-gray-700">Generating Spatial H3 Clusters</span>
+          
+          <div className="w-full bg-gray-800 h-1 relative">
+            <div className="h-full bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#FBBC04] transition-all duration-1000 ease-in-out" style={{ width: `${progress}%` }}></div>
           </div>
         </div>
       </div>

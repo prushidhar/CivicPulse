@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
-import { ChevronDown, ChevronUp, Brain, Zap, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp, Brain, Zap, FileText, Volume2 } from 'lucide-react';
 
 export default function CitizenRequests() {
   const context = useOutletContext<{ globalSearch: string }>();
@@ -11,6 +11,16 @@ export default function CitizenRequests() {
   const [requests, setRequests] = useState<any[] | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterDepartment, setFilterDepartment] = useState<string>('All');
+
+  const handlePlaySpeech = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
@@ -245,17 +255,39 @@ export default function CitizenRequests() {
                           <Brain className="w-4 h-4 text-white" />
                         </div>
                         <h3 className="font-bold text-purple-700 dark:text-purple-300">Google Gemini AI Analysis</h3>
-                        <span className="text-xs text-muted-foreground ml-auto">
-                          Confidence: <strong>{r.ai_confidence ? `${(r.ai_confidence * 100).toFixed(0)}%` : 'N/A'}</strong>
-                        </span>
+                          <div className="ml-auto flex items-center gap-2">
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Confidence</span>
+                            {r.ai_confidence ? (
+                              <div className={`px-2 py-1 rounded-full text-xs font-extrabold flex items-center gap-1 ${r.ai_confidence > 0.8 ? 'bg-green-100 text-green-700 border border-green-200' : r.ai_confidence > 0.6 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
+                                {(r.ai_confidence * 100).toFixed(0)}%
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">N/A</span>
+                            )}
+                          </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* AI Summary */}
                         <div className="md:col-span-2 bg-white dark:bg-background rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-                          <div className="flex items-center gap-2 mb-2">
-                            <FileText className="w-4 h-4 text-purple-500" />
-                            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">AI Summary</span>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-purple-500" />
+                              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">AI Summary</span>
+                            </div>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const textToRead = r.transcript && r.transcript.includes('AI Summary:') 
+                                  ? r.transcript.split('AI Summary:')[1]?.split('\n\nRecommended Action:')[0]?.trim() 
+                                  : r.original_text || 'Run AI analysis by submitting a new request.';
+                                handlePlaySpeech(textToRead);
+                              }}
+                              className="p-1 hover:bg-purple-50 rounded-md text-purple-500 transition-colors"
+                              title="Play AI Summary"
+                            >
+                              <Volume2 className="w-4 h-4" />
+                            </button>
                           </div>
                           <p className="text-sm text-foreground leading-relaxed">
                             {r.transcript && r.transcript.includes('AI Summary:')

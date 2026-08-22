@@ -39,23 +39,33 @@ export default function HotspotMap() {
             mapId="DEMO_MAP_ID"
             disableDefaultUI={true}
             zoomControl={true}
-          >
-            {showPoints && requests.map((r, i) => (
-              <AdvancedMarker 
-                key={i}
-                position={{ lat: r.latitude, lng: r.longitude }}
-                onClick={() => setSelectedReport(r)}
-              >
-                <div style={{
-                  width: '12px', height: '12px', borderRadius: '50%',
-                  backgroundColor: getColor(r.severity),
-                  border: '2px solid white',
-                  boxShadow: '0 0 4px rgba(0,0,0,0.3)',
-                  opacity: 1
-                }} />
-              </AdvancedMarker>
-            ))}
-          </Map>
+            >
+              {showPoints && requests.map((r, i) => {
+                const color = getColor(r.severity);
+                const isCritical = r.severity?.toLowerCase() === 'high' || r.severity?.toLowerCase() === 'critical';
+                
+                return (
+                  <AdvancedMarker 
+                    key={i}
+                    position={{ lat: r.latitude, lng: r.longitude }}
+                    onClick={() => setSelectedReport(r)}
+                  >
+                    <div className="relative flex items-center justify-center">
+                      {isCritical && (
+                        <div 
+                          className="absolute w-8 h-8 rounded-full animate-ping opacity-75"
+                          style={{ backgroundColor: color }}
+                        />
+                      )}
+                      <div 
+                        className="relative z-10 w-4 h-4 rounded-full border-2 border-white shadow-md transition-transform hover:scale-125"
+                        style={{ backgroundColor: color }}
+                      />
+                    </div>
+                  </AdvancedMarker>
+                );
+              })}
+            </Map>
         </APIProvider>
         
         {/* Layer Toggles Panel */}

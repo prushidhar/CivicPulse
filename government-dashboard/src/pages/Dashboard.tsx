@@ -5,6 +5,23 @@ import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
 import { APIProvider, Map as GoogleMap, AdvancedMarker } from '@vis.gl/react-google-maps';
 
+const CountUp = ({ end, duration = 1000, suffix = "" }: { end: number, duration?: number, suffix?: string }) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      // easeOutQuart formula for smooth deceleration
+      const easeProgress = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(easeProgress * end));
+      if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  }, [end, duration]);
+  return <>{count.toLocaleString()}{suffix}</>;
+};
+
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -156,7 +173,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Hotspots</p>
-                <h3 className="text-2xl font-bold">{stats.activeHotspots}</h3>
+                <h3 className="text-2xl font-bold"><CountUp end={stats.activeHotspots} /></h3>
               </div>
             </CardContent>
           </Card>
@@ -168,7 +185,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Priority Recs</p>
-                <h3 className="text-2xl font-bold">{stats.priorityRecs}</h3>
+                <h3 className="text-2xl font-bold"><CountUp end={stats.priorityRecs} /></h3>
               </div>
             </CardContent>
           </Card>
@@ -180,7 +197,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Pending Reviews</p>
-                <h3 className="text-2xl font-bold">{stats.pendingReviews}</h3>
+                <h3 className="text-2xl font-bold"><CountUp end={stats.pendingReviews} /></h3>
               </div>
             </CardContent>
           </Card>
@@ -192,7 +209,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Est. Impact</p>
-                <h3 className="text-2xl font-bold">{stats.impact.toLocaleString()}</h3>
+                <h3 className="text-2xl font-bold"><CountUp end={stats.impact} /></h3>
               </div>
             </CardContent>
           </Card>
