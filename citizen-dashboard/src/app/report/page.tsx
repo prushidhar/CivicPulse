@@ -219,15 +219,15 @@ export default function ReportPage() {
           <div className="p-8 text-left space-y-6 font-mono">
             <div className={`flex items-center gap-4 transition-all duration-500 ${progress >= 30 ? "text-[#34A853]" : "text-gray-500"}`}>
               {progress >= 30 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" />}
-              <span className="text-sm md:text-base">> Initializing secure government connection...</span>
+              <span className="text-sm md:text-base">&gt; Initializing secure government connection...</span>
             </div>
             <div className={`flex items-center gap-4 transition-all duration-500 delay-300 ${progress >= 60 ? "text-[#34A853]" : progress >= 30 ? "text-[#4285F4]" : "text-gray-700"}`}>
               {progress >= 60 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : progress >= 30 ? <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-700 flex-shrink-0"></div>}
-              <span className="text-sm md:text-base">> Parsing citizen media & extracting geospatial context...</span>
+              <span className="text-sm md:text-base">&gt; Parsing citizen media & extracting geospatial context...</span>
             </div>
             <div className={`flex items-center gap-4 transition-all duration-500 delay-500 ${progress >= 100 ? "text-[#34A853]" : progress >= 60 ? "text-[#4285F4]" : "text-gray-700"}`}>
               {progress >= 100 ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : progress >= 60 ? <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-700 flex-shrink-0"></div>}
-              <span className="text-sm md:text-base">> Structuring AI summary & routing to official dashboard...</span>
+              <span className="text-sm md:text-base">&gt; Structuring AI summary & routing to official dashboard...</span>
             </div>
           </div>
           
