@@ -37,7 +37,7 @@ export default function Header() {
         </Link>
         <div className="flex items-center gap-3 md:gap-4">
           <a 
-            href={process.env.NEXT_PUBLIC_GOV_URL || "https://civic-pulse-jq6a-jgb6c2y6h-powerhouse13.vercel.app"} 
+            href="https://civic-pulse-jq6a-jgb6c2y6h-powerhouse13.vercel.app" 
             target="_blank"
             rel="noopener noreferrer"
             className="hidden lg:flex items-center justify-center px-4 py-2.5 bg-[#4285F4]/10 hover:bg-[#4285F4]/20 text-[#4285F4] font-bold rounded-xl transition shadow-sm border border-[#4285F4]/20"
