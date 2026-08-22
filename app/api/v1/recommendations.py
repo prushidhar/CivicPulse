@@ -9,20 +9,20 @@ router = APIRouter()
 def map_rec_for_frontend(rec):
     return {
         "id": str(rec.recommendation_id),
-        "hotspotId": "CLUSTER-001", # mock for now
+        "hotspotId": getattr(rec, "hotspot_id", ""),
         "priorityScore": int(rec.score) if rec.score else 0,
         "title": rec.project_type or "Infrastructure Intervention",
-        "description": rec.rationale or "AI-generated rationale based on multiple data sources.",
+        "description": rec.rationale or "No rationale provided.",
         "status": rec.decision or "pending",
         "scores": {
-            "demandIntensity": 25,
-            "infrastructureGap": 15,
-            "vulnerability": 10,
-            "affectedPopulation": 5,
-            "urgencyRisk": 10,
-            "trendAcceleration": 10,
-            "feasibility": 5,
-            "equityAdjustment": 5
+            "demandIntensity": 0,
+            "infrastructureGap": 0,
+            "vulnerability": 0,
+            "affectedPopulation": 0,
+            "urgencyRisk": 0,
+            "trendAcceleration": 0,
+            "feasibility": 0,
+            "equityAdjustment": 0
         }
     }
 
@@ -44,27 +44,9 @@ def get_recommendation_evidence(rec_id: str, db: Session = Depends(get_db)):
     if not rec:
         raise HTTPException(status_code=404, detail="Recommendation not found")
     
-    # Return mock evidence or the actual stored JSONB evidence
     if getattr(rec, "evidence", None):
         return rec.evidence
-    
-    # Fallback to impressive mock evidence if pipeline hasn't run fully
-    return [
-        {
-            "id": "EV-1",
-            "recommendationId": str(rec_id),
-            "type": "citizen_report",
-            "description": "High volume of citizen complaints in this cluster indicating urgent public safety risk.",
-            "confidence": 0.95
-        },
-        {
-            "id": "EV-2",
-            "recommendationId": str(rec_id),
-            "type": "infrastructure_sensor",
-            "description": "Cross-referenced with recent civic data indicating outdated infrastructure in this zone.",
-            "confidence": 0.88
-        }
-    ]
+    return []
 
 @router.post("/{rec_id}/decision")
 def submit_decision(rec_id: str, decision: RecommendationDecision, db: Session = Depends(get_db)):
