@@ -108,7 +108,7 @@ def list_requests(db: Session = Depends(get_db)):
             r.severity = "Pending"
             
         media_records = db.query(RequestMedia).filter(RequestMedia.request_id == r.request_id).all()
-        r.media = [{"url": f"/api/v1/media/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
+        r.media = [{"url": f"/api/v1/requests/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
     return reqs
 
 @router.get("/{request_id}", response_model=CitizenRequestDetail)
@@ -130,7 +130,7 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
     setattr(db_req, "description", db_req.original_text)
     
     media_records = db.query(RequestMedia).filter(RequestMedia.request_id == db_req.request_id).all()
-    db_req.media = [{"url": f"/api/v1/media/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
+    db_req.media = [{"url": f"/api/v1/requests/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
     
     # If the background pipeline never ran, run it on-demand now
     if not db_req.category:

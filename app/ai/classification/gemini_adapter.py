@@ -52,29 +52,77 @@ Citizen Request: "{text}"
         }
 
 
+import tempfile
+import time
+
 def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/webm") -> str:
     """Uses Gemini multimodal to transcribe audio from citizen voice reports."""
+    tmp_path = None
+    uploaded_file = None
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        audio_part = {"mime_type": mime_type.split(";")[0].strip() if mime_type else "audio/webm", "data": audio_bytes}
+        clean_mime = mime_type.split(";")[0].strip() if mime_type else "audio/webm"
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+            tmp.write(audio_bytes)
+            tmp_path = tmp.name
+            
+        uploaded_file = genai.upload_file(path=tmp_path, mime_type=clean_mime)
+        
         response = model.generate_content([
-            "Please accurately transcribe this audio. Return ONLY the transcription text, nothing else.",
-            audio_part
+            "Please accurately transcribe this audio. Keep the transcription in the original language or translate to English. Return ONLY the transcription text, nothing else.",
+            uploaded_file
         ])
         return response.text.strip()
     except Exception as e:
         logger.error(f"Gemini ASR Error: {e}")
         return ""
+    finally:
+        try:
+            if uploaded_file: genai.delete_file(uploaded_file.name)
+            if tmp_path and os.path.exists(tmp_path): os.remove(tmp_path)
+        except Exception:
+            pass
 
 def analyze_media_with_gemini(media_bytes: bytes, mime_type: str = "image/jpeg") -> str:
     """Uses Gemini multimodal to extract a visual description of citizen photo or video reports."""
+    tmp_path = None
+    uploaded_file = None
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
         clean_mime_type = mime_type.split(";")[0].strip() if mime_type else "image/jpeg"
-        media_part = {"mime_type": clean_mime_type, "data": media_bytes}
-        prompt = "Analyze this visual media (photo or video) submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem (e.g., 'A deep pothole on a paved road filled with water. There is heavy traffic nearby.'). Do not make assumptions, just describe the visual evidence."
-        response = model.generate_content([prompt, media_part])
+        
+        # If it's an image, we can just use inline data which is faster
+        if "image" in clean_mime_type:
+            media_part = {"mime_type": clean_mime_type, "data": media_bytes}
+            prompt = "Analyze this visual media (photo or video) submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem. Do not make assumptions, just describe the visual evidence."
+            response = model.generate_content([prompt, media_part])
+            return response.text.strip()
+            
+        # If it's video, we MUST use the File API
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
+            tmp.write(media_bytes)
+            tmp_path = tmp.name
+            
+        uploaded_file = genai.upload_file(path=tmp_path, mime_type=clean_mime_type)
+        
+        # Wait for video to process
+        while uploaded_file.state.name == 'PROCESSING':
+            time.sleep(2)
+            uploaded_file = genai.get_file(uploaded_file.name)
+            
+        if uploaded_file.state.name == 'FAILED':
+            raise Exception("Gemini File API processing failed")
+            
+        prompt = "Analyze this visual media (photo or video) submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem. Do not make assumptions, just describe the visual evidence."
+        response = model.generate_content([prompt, uploaded_file])
         return response.text.strip()
     except Exception as e:
         logger.error(f"Gemini Vision Error: {e}")
         return ""
+    finally:
+        try:
+            if uploaded_file: genai.delete_file(uploaded_file.name)
+            if tmp_path and os.path.exists(tmp_path): os.remove(tmp_path)
+        except Exception:
+            pass
