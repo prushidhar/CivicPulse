@@ -11,5 +11,5 @@ router.include_router(recommendations.router, prefix="/recommendations", tags=["
 router.include_router(impact.router, prefix="/impact", tags=["Impact Analytics"])
 router.include_router(dashboard_data.router, tags=["Dashboard Data"])
 router.include_router(demo.router, prefix="/demo", tags=["Demo Data"])
-router.include_router(catalogs.router, tags=["Data Catalogs"])
+router.include_router(catalogs.router, prefix="/catalogs", tags=["Data Catalogs"])
 router.include_router(audit.router, prefix="/audit", tags=["Audit Trail"])

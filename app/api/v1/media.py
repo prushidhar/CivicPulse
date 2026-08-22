@@ -96,12 +96,19 @@ def download_media(media_id: str, db: Session = Depends(get_db)):
     from fastapi.responses import Response, FileResponse
     
     if media.object_key and media.object_key.startswith("base64:"):
-        import base64
+        import base64, tempfile
         file_bytes = base64.b64decode(media.object_key[7:])
         
-        # Return a direct Response because Vercel Serverless ASGI adapters 
-        # often fail to stream FileResponse correctly and return 500s.
-        return Response(content=file_bytes, media_type=media.media_type)
+        # We MUST use FileResponse instead of raw Response for audio/video 
+        # so FastAPI automatically handles HTTP Range headers (otherwise audio shows 0:00)
+        tmp_dir = tempfile.gettempdir()
+        media_dir = os.path.join(tmp_dir, "civicpulse_media_serve")
+        os.makedirs(media_dir, exist_ok=True)
+        local_path = os.path.join(media_dir, f"{media.media_id}.bin")
+        if not os.path.exists(local_path):
+            with open(local_path, "wb") as f:
+                f.write(file_bytes)
+        return FileResponse(local_path, media_type=media.media_type)
         
     if not os.path.exists(media.object_key):
         raise HTTPException(status_code=404, detail="File missing on disk")

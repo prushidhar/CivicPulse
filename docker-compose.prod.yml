@@ -8,6 +8,8 @@ services:
     build: .
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       # These must be set in your host environment or .env file to sync with the other teams
       - DATABASE_URL=${DATABASE_URL}
@@ -22,6 +24,8 @@ services:
   worker:
     build: .
     command: celery -A app.workers.celery_app worker --loglevel=info
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}

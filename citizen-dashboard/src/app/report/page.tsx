@@ -164,18 +164,22 @@ export default function ReportPage() {
       
       const requestId = data.id || data.request_id;
 
-      if (audioBlob || uploadedFile) {
+      if (audioBlob) {
         const formData = new FormData();
-        if (audioBlob) {
-          formData.append("file", audioBlob, "recording.webm");
-        } else if (uploadedFile) {
-          formData.append("file", uploadedFile);
-        }
-        
+        formData.append("file", audioBlob, "recording.webm");
         await fetch(`/api/v1/requests/${requestId}/media`, {
           method: "POST",
           body: formData
-        }).catch(err => console.error("Media upload failed", err));
+        }).catch(err => console.error("Audio media upload failed", err));
+      }
+      
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append("file", uploadedFile);
+        await fetch(`/api/v1/requests/${requestId}/media`, {
+          method: "POST",
+          body: formData
+        }).catch(err => console.error("File media upload failed", err));
       }
       
       setProgress(100);

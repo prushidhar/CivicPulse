@@ -7,6 +7,29 @@ from app.schemas.requests import RecommendationDecision
 router = APIRouter()
 
 def map_rec_for_frontend(rec):
+    scores = {
+        "demandIntensity": 0,
+        "infrastructureGap": 0,
+        "vulnerability": 0,
+        "affectedPopulation": 0,
+        "urgencyRisk": 0,
+        "trendAcceleration": 0,
+        "feasibility": 0,
+        "equityAdjustment": 0
+    }
+    
+    evidence = getattr(rec, "evidence", {})
+    if evidence and isinstance(evidence, dict) and "components" in evidence:
+        comps = evidence["components"]
+        scores["demandIntensity"] = comps.get("demand_intensity", 0)
+        scores["infrastructureGap"] = comps.get("infrastructure_gap", 0)
+        scores["vulnerability"] = comps.get("vulnerability", 0)
+        scores["affectedPopulation"] = comps.get("affected_population", 0)
+        scores["urgencyRisk"] = comps.get("urgency_risk", 0)
+        scores["trendAcceleration"] = comps.get("trend_acceleration", 0)
+        scores["feasibility"] = comps.get("feasibility", 0)
+        scores["equityAdjustment"] = comps.get("equity_adjustment", 0)
+
     return {
         "id": str(rec.recommendation_id),
         "hotspotId": getattr(rec, "hotspot_id", ""),
@@ -14,16 +37,7 @@ def map_rec_for_frontend(rec):
         "title": rec.project_type or "Infrastructure Intervention",
         "description": rec.rationale or "No rationale provided.",
         "status": rec.decision or "pending",
-        "scores": {
-            "demandIntensity": 0,
-            "infrastructureGap": 0,
-            "vulnerability": 0,
-            "affectedPopulation": 0,
-            "urgencyRisk": 0,
-            "trendAcceleration": 0,
-            "feasibility": 0,
-            "equityAdjustment": 0
-        }
+        "scores": scores
     }
 
 @router.get("")
