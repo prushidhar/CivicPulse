@@ -45,11 +45,11 @@ def get_indicators(db: Session = Depends(get_db)):
         return []
     return [
         {
-            "id": str(i.indicator_id),
-            "name": i.name,
-            "value": i.value,
-            "unit": i.unit,
-            "source": i.source
+            "id": str(i.id),
+            "name": i.indicator_code or "Unknown",
+            "value": i.value or 0,
+            "unit": i.unit or "",
+            "source": i.source or ""
         }
         for i in indicators
     ]
@@ -61,10 +61,10 @@ def get_datasets(db: Session = Depends(get_db)):
         return []
     return [
         {
-            "id": str(d.dataset_id),
-            "title": d.title,
-            "source": d.source,
-            "url": d.url
+            "id": str(d.id),
+            "title": d.name or "Unknown Dataset",
+            "source": d.source or "",
+            "url": d.url or ""
         }
         for d in datasets
     ]
