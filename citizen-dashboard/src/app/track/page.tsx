@@ -28,7 +28,6 @@ export default function TrackPage() {
     } catch (error: any) {
       console.error(error);
       setTrackData(null);
-      alert("Error: Could not find that request ID. Make sure you submit a real report first!");
     } finally {
       setLoading(false);
       setHasSearched(true);
@@ -141,7 +140,7 @@ export default function TrackPage() {
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">AI Categorization</h3>
                   <div className="flex flex-wrap gap-2">
                     <span className="px-4 py-2 bg-gray-50 rounded-xl text-gray-800 font-bold border border-gray-100">{trackData?.category || "Unknown"}</span>
-                    <span className="px-4 py-2 bg-[#EA4335]/5 text-[#EA4335] rounded-xl font-bold border border-[#EA4335]/10">{trackData?.severity || "Normal"}</span>
+                    <span className="px-4 py-2 bg-[#EA4335]/5 text-[#EA4335] rounded-xl font-bold border border-[#EA4335]/10">{trackData?.urgency || trackData?.severity || "Normal"}</span>
                   </div>
                 </div>
                 
@@ -189,32 +188,31 @@ export default function TrackPage() {
                 </div>
               )}
               
-              <div className="grid grid-cols-2 gap-6">
+              {trackData?.media && trackData.media.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">Category</h3>
-                  <p className="font-bold text-primary text-lg">{trackData?.category || "N/A"}</p>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">Severity</h3>
-                  <p className="font-bold text-secondary text-lg">{trackData?.urgency || trackData?.severity || "N/A"}</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">Location (Public View)</h3>
-                <div className="flex items-start gap-4 text-primary bg-background p-6 rounded-3xl border border-gray-100/50">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" />
+                  <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest">Uploaded Evidence</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {trackData.media.map((m: any, idx: number) => (
+                      <div key={idx} className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                        {(m.type || '').includes('image') ? (
+                          <img src={m.url} alt="Evidence" className="h-40 object-cover rounded-2xl" />
+                        ) : (m.type || '').includes('audio') ? (
+                          <div className="p-4 bg-gray-50 rounded-2xl">
+                            <audio src={m.url} controls className="h-10" />
+                          </div>
+                        ) : (m.type || '').includes('video') ? (
+                          <video src={m.url} controls className="h-40 rounded-2xl" />
+                        ) : (
+                          <a href={m.url} target="_blank" rel="noopener noreferrer" className="p-4 block text-primary text-sm font-bold">Download Attachment</a>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-medium text-lg">Lat: {trackData?.latitude ? trackData.latitude.toFixed(4) : "..."} Lng: {trackData?.longitude ? trackData.longitude.toFixed(4) : "..."}</p>
-                    <span className="block text-sm text-primary/50 mt-1 font-medium">Precise location hidden for privacy</span>
-                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className="md:col-span-2 bg-background p-8 rounded-[2rem] border border-gray-100/50">
+            <div className="md:col-span-3 bg-background p-8 rounded-[2rem] border border-gray-100/50">
               <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-8">{t("lifecycleStatus")}</h3>
               <div className="space-y-8">
                 {steps.map((step, index) => (

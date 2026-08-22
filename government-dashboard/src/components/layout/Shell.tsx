@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles, LogOut } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -20,7 +20,13 @@ const navItems = [
 export default function Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const [clock, setClock] = useState(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setInterval(() => setClock(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminAuthenticated');
@@ -130,6 +136,7 @@ export default function Shell() {
             </div>
           </div>
           <div className="flex items-center space-x-3 md:space-x-4">
+            <span className="text-xs font-mono text-muted-foreground hidden md:block">{clock}</span>
             <a 
               href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-citizen.vercel.app"} 
               target="_blank"

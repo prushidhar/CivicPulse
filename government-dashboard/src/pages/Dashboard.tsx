@@ -90,8 +90,8 @@ export default function Dashboard() {
     <div className="space-y-8 mt-2">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Overview</h1>
-          <p className="text-muted-foreground mt-1">Live metrics generated from actual citizen reports.</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Government Command Center</h1>
+          <p className="text-gray-500 font-medium mt-1">Real-time AI-powered civic intelligence dashboard</p>
         </div>
         <div className="flex space-x-3">
           <button 
