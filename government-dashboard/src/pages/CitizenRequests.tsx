@@ -319,6 +319,19 @@ export default function CitizenRequests() {
                               <span className="text-xs font-medium text-red-600">{r.transcript.split('Risk Assessment:')[1]?.trim()}</span>
                             </div>
                           )}
+                          {r.latitude && r.longitude && (
+                            <div className="flex gap-2 mt-2 pt-2 border-t border-purple-100 dark:border-purple-900">
+                              <span className="text-xs font-bold text-muted-foreground uppercase">Location:</span>
+                              <a 
+                                href={`https://www.google.com/maps?q=${r.latitude},${r.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-mono text-blue-600 hover:underline"
+                              >
+                                {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+                              </a>
+                            </div>
+                          )}
                         </div>
 
                         {/* Media Preview */}

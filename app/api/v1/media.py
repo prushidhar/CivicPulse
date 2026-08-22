@@ -89,19 +89,15 @@ def download_media(media_id: str, db: Session = Depends(get_db)):
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
     
-    from fastapi.responses import FileResponse
+    from fastapi.responses import Response, FileResponse
     
     if media.object_key and media.object_key.startswith("base64:"):
         import base64
-        import tempfile
         file_bytes = base64.b64decode(media.object_key[7:])
         
-        # Write to a temporary file to allow FileResponse to handle HTTP Range requests
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".media")
-        tmp.write(file_bytes)
-        tmp.close()
-        
-        return FileResponse(tmp.name, media_type=media.media_type)
+        # Return a direct Response because Vercel Serverless ASGI adapters 
+        # often fail to stream FileResponse correctly and return 500s.
+        return Response(content=file_bytes, media_type=media.media_type)
         
     if not os.path.exists(media.object_key):
         raise HTTPException(status_code=404, detail="File missing on disk")
