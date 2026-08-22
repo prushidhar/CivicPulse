@@ -24,11 +24,11 @@ def process_media_background(request_id: str, local_path: str, content_type: str
                     req.original_text = transcription
                 db.commit()
 
-        elif content_type and "image" in content_type:
-            from app.ai.classification.gemini_adapter import analyze_image_with_gemini
+        elif content_type and ("image" in content_type or "video" in content_type):
+            from app.ai.classification.gemini_adapter import analyze_media_with_gemini
             with open(local_path, "rb") as f:
-                image_bytes = f.read()
-            vision_analysis = analyze_image_with_gemini(image_bytes, content_type)
+                media_bytes = f.read()
+            vision_analysis = analyze_media_with_gemini(media_bytes, content_type)
             if vision_analysis:
                 if not req.original_text or req.original_text in ["Attached media file", "No description provided"]:
                     req.original_text = f"[VISUAL EVIDENCE]: {vision_analysis}"

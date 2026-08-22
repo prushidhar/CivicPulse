@@ -66,13 +66,14 @@ def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/web
         logger.error(f"Gemini ASR Error: {e}")
         return ""
 
-def analyze_image_with_gemini(image_bytes: bytes, mime_type: str = "image/jpeg") -> str:
-    """Uses Gemini multimodal to extract a visual description of citizen photo reports."""
+def analyze_media_with_gemini(media_bytes: bytes, mime_type: str = "image/jpeg") -> str:
+    """Uses Gemini multimodal to extract a visual description of citizen photo or video reports."""
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        image_part = {"mime_type": mime_type, "data": image_bytes}
-        prompt = "Analyze this image submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem (e.g., 'A deep pothole on a paved road filled with water. There is heavy traffic nearby.'). Do not make assumptions, just describe the visual evidence."
-        response = model.generate_content([prompt, image_part])
+        clean_mime_type = mime_type.split(";")[0].strip() if mime_type else "image/jpeg"
+        media_part = {"mime_type": clean_mime_type, "data": media_bytes}
+        prompt = "Analyze this visual media (photo or video) submitted by a citizen reporting a civic or infrastructure issue in India. Provide a concise, 2-sentence description of the visible problem (e.g., 'A deep pothole on a paved road filled with water. There is heavy traffic nearby.'). Do not make assumptions, just describe the visual evidence."
+        response = model.generate_content([prompt, media_part])
         return response.text.strip()
     except Exception as e:
         logger.error(f"Gemini Vision Error: {e}")
