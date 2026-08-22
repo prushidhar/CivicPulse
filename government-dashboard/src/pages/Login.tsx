@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Smartphone, ArrowRight, Loader2, KeyRound, Lock, Database, Globe, Zap } from 'lucide-react';
 
@@ -10,6 +10,11 @@ export default function Login() {
   const [showAppLoader, setShowAppLoader] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Force secure state reset when hitting the login page
+  useEffect(() => {
+    localStorage.removeItem('isAdminAuthenticated');
+  }, []);
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
