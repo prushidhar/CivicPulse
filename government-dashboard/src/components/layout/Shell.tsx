@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles, LogOut } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -20,6 +20,12 @@ const navItems = [
 export default function Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminAuthenticated');
+    navigate('/login');
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -37,11 +43,9 @@ export default function Shell() {
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-16 items-center px-6 border-b border-border/50 bg-background/50 backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight">CivicPulse <span className="text-primary">Admin</span></span>
+          <div className="flex items-center gap-3">
+            <img src="/logo.jpg" alt="CivicPulse Logo" className="h-8 md:h-10 object-contain rounded-md" />
+            <span className="text-xl font-extrabold tracking-tight">Admin<span className="text-primary">Portal</span></span>
           </div>
           <button 
             className="ml-auto lg:hidden text-muted-foreground hover:text-foreground"
@@ -86,12 +90,19 @@ export default function Shell() {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border/50 bg-background/50 backdrop-blur-md">
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors cursor-pointer border border-transparent hover:border-border/50">
+          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-border/50">
             <UserCircle className="w-10 h-10 text-muted-foreground" />
             <div className="flex-1 overflow-hidden">
               <p className="text-sm font-bold truncate">Admin User</p>
               <p className="text-xs text-muted-foreground truncate">Government of India</p>
             </div>
+            <button 
+              onClick={handleLogout}
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </aside>
