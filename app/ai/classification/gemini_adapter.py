@@ -1,14 +1,33 @@
 import os
+import re
 import json
 import logging
+import tempfile
+import time
 import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
+# Configure Gemini API key - will be re-checked on each call if empty
+_api_configured = False
+
+def _ensure_gemini_configured():
+    global _api_configured
+    if not _api_configured:
+        api_key = os.getenv("GEMINI_API_KEY", "")
+        if api_key:
+            genai.configure(api_key=api_key)
+            _api_configured = True
+        else:
+            logger.warning("GEMINI_API_KEY not found in environment variables")
+
+# Attempt initial configuration
+_ensure_gemini_configured()
+
 
 def classify_with_gemini(text: str) -> dict:
     """Uses Gemini to extract structured classification from citizen text."""
+    _ensure_gemini_configured()
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""You are an AI assistant for a government digital public infrastructure platform in India.
@@ -31,12 +50,13 @@ Citizen Request: "{text}"
 """
         response = model.generate_content(prompt)
         clean_text = response.text.strip()
-        # Strip markdown code fences if present
-        if clean_text.startswith("```"):
-            clean_text = clean_text.split("```")[1]
-            if clean_text.startswith("json"):
-                clean_text = clean_text[4:]
-        result = json.loads(clean_text.strip())
+        
+        # Robust JSON extraction using regex - handles Gemini adding markdown fences or preamble text
+        json_match = re.search(r'\{.*\}', clean_text, re.DOTALL)
+        if json_match:
+            result = json.loads(json_match.group())
+        else:
+            result = json.loads(clean_text)
         return result
     except Exception as e:
         logger.error(f"Gemini API Error: {e}")
@@ -48,26 +68,50 @@ Citizen Request: "{text}"
             "confidence": 0.5,
             "summary": text[:200] if text else "No description provided.",
             "recommended_action": "Review and assess the citizen report for appropriate action.",
+            "department": "General Administration",
+            "risk_assessment": "Standard risk level.",
             "translated_text": text
         }
 
 
-import tempfile
-import time
+def _get_suffix_for_mime(mime_type: str) -> str:
+    """Get a proper file suffix based on mime type."""
+    mime_map = {
+        "audio/webm": ".webm",
+        "audio/wav": ".wav",
+        "audio/mpeg": ".mp3",
+        "audio/mp3": ".mp3",
+        "audio/mp4": ".m4a",
+        "audio/m4a": ".m4a",
+        "audio/ogg": ".ogg",
+        "video/mp4": ".mp4",
+        "video/webm": ".webm",
+    }
+    return mime_map.get(mime_type, ".webm")
+
 
 def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/webm") -> str:
     """Uses Gemini multimodal to transcribe audio from citizen voice reports."""
+    _ensure_gemini_configured()
     tmp_path = None
     uploaded_file = None
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
         clean_mime = mime_type.split(";")[0].strip() if mime_type else "audio/webm"
+        suffix = _get_suffix_for_mime(clean_mime)
         
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(audio_bytes)
             tmp_path = tmp.name
             
         uploaded_file = genai.upload_file(path=tmp_path, mime_type=clean_mime)
+        
+        while uploaded_file.state.name == 'PROCESSING':
+            time.sleep(2)
+            uploaded_file = genai.get_file(uploaded_file.name)
+            
+        if uploaded_file.state.name == 'FAILED':
+            raise Exception("Gemini File API processing failed for audio")
         
         response = model.generate_content([
             "Please accurately transcribe this audio. Keep the transcription in the original language or translate to English. Return ONLY the transcription text, nothing else.",
@@ -86,6 +130,7 @@ def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/web
 
 def analyze_media_with_gemini(media_bytes: bytes, mime_type: str = "image/jpeg") -> str:
     """Uses Gemini multimodal to extract a visual description of citizen photo or video reports."""
+    _ensure_gemini_configured()
     tmp_path = None
     uploaded_file = None
     try:
@@ -100,7 +145,8 @@ def analyze_media_with_gemini(media_bytes: bytes, mime_type: str = "image/jpeg")
             return response.text.strip()
             
         # If it's video, we MUST use the File API
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
+        suffix = _get_suffix_for_mime(clean_mime_type)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(media_bytes)
             tmp_path = tmp.name
             

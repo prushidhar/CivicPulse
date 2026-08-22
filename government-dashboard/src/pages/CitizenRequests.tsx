@@ -155,7 +155,7 @@ export default function CitizenRequests() {
                 await api.updateRequestStatus(p.request_id, 'accepted');
               }
               const latest = await api.getRequests();
-              setRequests(latest);
+              setRequests(Array.isArray(latest) ? latest : latest?.items || []);
             }}
             className="px-4 py-2 bg-[#4285F4] text-white rounded-xl text-sm font-bold hover:bg-[#4285F4]/90 transition-colors flex items-center shadow-sm"
           >
@@ -349,6 +349,8 @@ export default function CitizenRequests() {
                                     <div className="p-3 bg-muted">
                                       <audio src={m.url} controls className="h-10" />
                                     </div>
+                                  ) : (m.type || '').includes('video') ? (
+                                    <video src={m.url} controls className="h-48 rounded max-w-full" />
                                   ) : (
                                     <a href={m.url} target="_blank" className="p-3 block text-primary text-sm font-medium">Download Attachment</a>
                                   )}

@@ -235,7 +235,7 @@ export default function Dashboard() {
                       <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
                         <div style={{
                           width: '10px', height: '10px', borderRadius: '50%',
-                          backgroundColor: r.severity === 'critical' ? '#ef4444' : r.severity === 'high' ? '#f97316' : '#3b82f6',
+                          backgroundColor: (r.severity || '').toLowerCase() === 'critical' ? '#ef4444' : (r.severity || '').toLowerCase() === 'high' ? '#f97316' : '#3b82f6',
                           border: '2px solid white',
                           boxShadow: '0 0 4px rgba(0,0,0,0.3)'
                         }} />
@@ -261,7 +261,7 @@ export default function Dashboard() {
                       <span className="text-sm font-bold truncate pr-4 capitalize">{item.category || 'Issue'}</span>
                       <span className="text-xs text-muted-foreground truncate pr-4">{item.intent || item.original_text || 'Pending Analysis'}</span>
                     </div>
-                    <Badge variant={item.severity === 'critical' || item.severity === 'high' ? 'destructive' : 'default'}>
+                    <Badge variant={(item.severity || '').toLowerCase() === 'critical' || (item.severity || '').toLowerCase() === 'high' ? 'destructive' : 'default'}>
                       {item.status}
                     </Badge>
                   </div>

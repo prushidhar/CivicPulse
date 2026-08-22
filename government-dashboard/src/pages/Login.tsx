@@ -89,7 +89,7 @@ export default function Login() {
           </div>
           <span className="text-2xl font-extrabold tracking-tight text-gray-900">CivicPulse <span className="text-[#4285F4]">Gov</span></span>
         </div>
-        <a href="http://localhost:3000" className="text-sm font-bold text-gray-500 hover:text-[#4285F4] transition-colors">
+        <a href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-jq6a.vercel.app"} className="text-sm font-bold text-gray-500 hover:text-[#4285F4] transition-colors">
           Citizen Portal &rarr;
         </a>
       </nav>

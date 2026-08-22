@@ -20,7 +20,7 @@ export default function HotspotMap() {
   }, []);
 
   const getColor = (severity: string) => {
-    switch(severity) {
+    switch((severity || '').toLowerCase()) {
       case 'critical': return '#EA4335';
       case 'high': return '#EA4335';
       case 'medium': return '#FBBC04';
@@ -99,7 +99,7 @@ export default function HotspotMap() {
               <CardHeader className="pb-3 border-b border-border/30">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg font-bold">{selectedReport.request_id.split('-')[0].toUpperCase()}</CardTitle>
-                  <Badge variant={selectedReport.severity === 'high' || selectedReport.severity === 'critical' ? 'destructive' : selectedReport.severity === 'medium' ? 'warning' : 'success'}>
+                  <Badge variant={(selectedReport.severity || '').toLowerCase() === 'high' || (selectedReport.severity || '').toLowerCase() === 'critical' ? 'destructive' : (selectedReport.severity || '').toLowerCase() === 'medium' ? 'warning' : 'success'}>
                     {(selectedReport.severity || 'low').toUpperCase()}
                   </Badge>
                 </div>

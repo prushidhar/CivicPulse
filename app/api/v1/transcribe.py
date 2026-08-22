@@ -12,5 +12,7 @@ async def transcribe_audio_standalone(file: UploadFile = File(...)):
             return {"transcription": transcription}
         else:
             raise HTTPException(status_code=422, detail="Could not transcribe audio")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

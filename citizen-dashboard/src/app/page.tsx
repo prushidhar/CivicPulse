@@ -120,7 +120,7 @@ export default function Home() {
                   <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
                     <div style={{
                       width: '12px', height: '12px', borderRadius: '50%',
-                      backgroundColor: r.severity === 'critical' || r.severity === 'high' ? '#EA4335' : r.severity === 'medium' ? '#FBBC04' : '#4285F4',
+                      backgroundColor: (r.severity || '').toLowerCase() === 'critical' || (r.severity || '').toLowerCase() === 'high' ? '#EA4335' : (r.severity || '').toLowerCase() === 'medium' ? '#FBBC04' : '#4285F4',
                       border: '2px solid white',
                       boxShadow: '0 0 8px rgba(0,0,0,0.2)'
                     }} />

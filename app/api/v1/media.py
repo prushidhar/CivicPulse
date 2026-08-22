@@ -56,11 +56,15 @@ async def upload_media(
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
         
-    ext = file.filename.split('.')[-1] if '.' in file.filename else "bin"
+    import tempfile
+    filename = getattr(file, "filename", None) or "upload.bin"
+    ext = filename.split('.')[-1] if '.' in filename else "bin"
     file_uuid = uuid.uuid4()
     
-    os.makedirs("/tmp/civicpulse_media", exist_ok=True)
-    local_path = f"/tmp/civicpulse_media/{file_uuid}.{ext}"
+    tmp_dir = tempfile.gettempdir()
+    media_dir = os.path.join(tmp_dir, "civicpulse_media")
+    os.makedirs(media_dir, exist_ok=True)
+    local_path = os.path.join(media_dir, f"{file_uuid}.{ext}")
     
     file_bytes = await file.read()
     

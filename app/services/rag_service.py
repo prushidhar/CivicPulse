@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.models.models import DocumentChunk, RecommendationEvidence
+from app.models.models import DocumentChunk
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)

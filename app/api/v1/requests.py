@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.requests import CitizenRequestCreate, CitizenRequestResponse, CitizenRequestDetail, CitizenRequestStatusUpdate
 from app.models.models import CitizenRequest
-from app.workers.request_tasks import process_citizen_request
 from typing import List
 
 router = APIRouter()
@@ -17,6 +16,8 @@ def run_pipeline_background(request_id: str):
         pipeline.run_full_pipeline(request_id)
     except Exception as e:
         print(f"Pipeline error in background: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
         db.close()
 
@@ -86,53 +87,52 @@ async def transcribe_audio(request_id: str, file: UploadFile = File(...), db: Se
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
 
+def _prepare_request_for_response(r, db):
+    """Prepare a CitizenRequest ORM object for API response without mutating the DB session."""
+    from app.models.models import RequestMedia
+    
+    # Extract lat/lng from PostGIS geometry WITHOUT setting location=None on the ORM object
+    if r.location is not None:
+        try:
+            from geoalchemy2.shape import to_shape
+            sh = to_shape(r.location)
+            r.longitude = sh.x
+            r.latitude = sh.y
+        except Exception:
+            pass
+    
+    # Use db.expunge() to detach from session so we can safely set location=None
+    # without it being flushed back to the database
+    db.expunge(r)
+    r.location = None
+    
+    setattr(r, "description", r.original_text)
+    if not r.category:
+        r.category = "Processing..."
+    if not r.severity:
+        r.severity = "Pending"
+        
+    media_records = db.query(RequestMedia).filter(RequestMedia.request_id == r.request_id).all()
+    r.media = [{"url": f"/api/v1/requests/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
+    return r
+
+
 @router.get("", response_model=List[CitizenRequestDetail])
 def list_requests(db: Session = Depends(get_db)):
-    from app.models.models import RequestMedia
     reqs = db.query(CitizenRequest).order_by(CitizenRequest.created_at.desc()).limit(100).all()
+    result = []
     for r in reqs:
-        if r.location is not None:
-            try:
-                # WKBElement needs to be converted to a shape or parsed
-                from geoalchemy2.shape import to_shape
-                sh = to_shape(r.location)
-                r.longitude = sh.x
-                r.latitude = sh.y
-            except Exception as e:
-                pass
-        r.location = None
-        setattr(r, "description", r.original_text)
-        if not r.category:
-            r.category = "Processing..."
-        if not r.severity:
-            r.severity = "Pending"
-            
-        media_records = db.query(RequestMedia).filter(RequestMedia.request_id == r.request_id).all()
-        r.media = [{"url": f"/api/v1/requests/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
-    return reqs
+        prepared = _prepare_request_for_response(r, db)
+        result.append(prepared)
+    return result
 
 @router.get("/{request_id}", response_model=CitizenRequestDetail)
 def get_request(request_id: str, db: Session = Depends(get_db)):
-    from app.models.models import RequestMedia
     db_req = db.query(CitizenRequest).filter(CitizenRequest.request_id == request_id).first()
     if not db_req:
         raise HTTPException(status_code=404, detail="Request not found")
     
-    if db_req.location is not None:
-        try:
-            from geoalchemy2.shape import to_shape
-            sh = to_shape(db_req.location)
-            db_req.longitude = sh.x
-            db_req.latitude = sh.y
-        except:
-            pass
-    db_req.location = None
-    setattr(db_req, "description", db_req.original_text)
-    
-    media_records = db.query(RequestMedia).filter(RequestMedia.request_id == db_req.request_id).all()
-    db_req.media = [{"url": f"/api/v1/requests/download/{str(m.media_id)}", "type": m.media_type} for m in media_records]
-    
-    # If the background pipeline never ran, run it on-demand now
+    # If the background pipeline never ran, run it on-demand now BEFORE expunging
     if not db_req.category:
         try:
             from app.services.pipeline_service import RequestPipeline
@@ -145,9 +145,8 @@ def get_request(request_id: str, db: Session = Depends(get_db)):
             print(f"Pipeline error on demand: {e}")
             db_req.category = "Processing..."
             db_req.severity = "Pending"
-            setattr(db_req, "description", f"ERROR: {e}\n\n{err_msg}")
-        
-    return db_req
+    
+    return _prepare_request_for_response(db_req, db)
 
 
 @router.patch('/{request_id}/status', response_model=CitizenRequestDetail)
@@ -158,10 +157,5 @@ def update_request_status(request_id: str, update: CitizenRequestStatusUpdate, d
     db_req.status = update.status
     db.commit()
     db.refresh(db_req)
-    db_req.location = None
-    setattr(db_req, 'description', db_req.original_text)
-    if not db_req.category:
-        db_req.category = 'Processing...'
-    if not db_req.severity:
-        db_req.severity = 'Pending'
-    return db_req
+    
+    return _prepare_request_for_response(db_req, db)

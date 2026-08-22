@@ -24,6 +24,7 @@ export default function Shell() {
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminAuthenticated');
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
