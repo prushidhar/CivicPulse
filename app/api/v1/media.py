@@ -79,7 +79,7 @@ async def upload_media(
     db.add(media)
     db.commit()
     
-    background_tasks.add_task(process_media_background, request_id, local_path, file.content_type)
+    process_media_background(request_id, local_path, file.content_type)
     
     return {"status": "success", "media_id": str(media.media_id)}
 
