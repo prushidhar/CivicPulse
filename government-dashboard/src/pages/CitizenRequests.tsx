@@ -345,7 +345,7 @@ export default function CitizenRequests() {
                           </div>
                           <div className="flex flex-wrap gap-4">
                             {r.media && r.media.length > 0 ? (
-                              r.media.map((m, idx) => (
+                              r.media.map((m: any, idx: number) => (
                                 <div key={idx} className="border border-border rounded overflow-hidden">
                                   {(m.type || '').includes('image') ? (
                                     <img src={m.url} alt="Evidence" className="h-48 object-cover max-w-full" />
