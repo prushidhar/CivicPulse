@@ -32,29 +32,29 @@ export default function Home() {
         <div className="relative z-10 space-y-6 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-bold text-gray-600 mb-2">
             <Sparkles className="w-4 h-4 text-[#34A853]" />
-            Powered by Google Gemini 1.5
+            {t("poweredBy")}
           </div>
           
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight">
-            Intelligent Civic <br className="hidden md:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#FBBC04]">Infrastructure for India.</span>
+            {t("intelligentCivic")} <br className="hidden md:block"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#FBBC04]">{t("infraForIndia")}</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto font-medium leading-relaxed">
-            Report issues via voice, text, or photos in any regional language. Our AI routes it directly to the right department.
+            {t("heroDesc")}
           </p>
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
           <Link href="/report" className="px-8 py-4 bg-[#4285F4] hover:bg-[#4285F4]/90 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-            Report an Issue <ArrowRight className="w-5 h-5" />
+            {t("reportAnIssue")} <ArrowRight className="w-5 h-5" />
           </Link>
           <a href={process.env.NEXT_PUBLIC_GOV_URL || "https://civic-pulse-gov.vercel.app"} target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 rounded-2xl font-bold text-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#34A853]" />
-            Gov Portal Access
+            {t("govPortalAccess")}
           </a>
           <Link href="/track" className="px-8 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 rounded-2xl font-bold text-lg shadow-sm transition-all flex items-center justify-center gap-2">
-            Track Status <Search className="w-5 h-5" />
+            {t("trackStatus")} <Search className="w-5 h-5" />
           </Link>
         </div>
       </section>
