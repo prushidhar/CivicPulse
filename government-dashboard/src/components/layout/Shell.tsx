@@ -52,11 +52,8 @@ export default function Shell() {
       )}>
         <div className="flex h-20 items-center px-6 border-b border-gray-100 bg-white/50">
           <div className="flex items-center gap-3">
-            <div className="relative flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-inner shadow-white/20">
-              <Hexagon className="w-6 h-6 text-white absolute" />
-              <div className="w-2 h-2 bg-white rounded-full z-10 animate-pulse"></div>
-            </div>
-            <span className="text-2xl font-extrabold tracking-tight text-gray-900">Civic<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Pulse</span></span>
+            <img src="/logo.jpg" alt="CivicPulse Logo" className="h-8 md:h-10 object-contain rounded-md" />
+            <span className="text-2xl font-extrabold tracking-tight text-gray-900">Admin<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Portal</span></span>
           </div>
           <button 
             className="ml-auto lg:hidden text-gray-500 hover:text-gray-900"
