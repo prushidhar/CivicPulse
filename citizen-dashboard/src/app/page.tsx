@@ -109,7 +109,7 @@ export default function Home() {
             </div>
           </div>
           <div className="h-[400px] w-full bg-gray-100">
-            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
+            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDummyKeyForDevelopmentPurposesOnly'}>
               <Map
                 defaultCenter={{ lat: 21.1458, lng: 79.0882 }}
                 defaultZoom={5}
