@@ -107,8 +107,8 @@ export default function CitizenRequests() {
             Citizen Reports
             <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">Live</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-2 font-medium flex items-center">
-            <Brain className="inline w-4 h-4 mr-1.5 text-[#4285F4]" />
+          <p className="text-sm text-gray-500 mt-2 font-medium">
+            <Brain className="inline-block w-4 h-4 mr-1.5 text-[#4285F4] align-text-bottom" />
             Analyzed, Translated, and Routed by <span className="font-bold text-gray-800 ml-1">Google Gemini 1.5</span>
           </p>
         </div>
