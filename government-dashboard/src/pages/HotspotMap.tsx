@@ -48,7 +48,7 @@ export default function HotspotMap() {
   };
 
   return (
-    <div className="flex h-full w-full relative">
+    <div className="flex h-[calc(100vh-140px)] min-h-[600px] w-full relative rounded-2xl overflow-hidden border border-border/50 shadow-sm">
       <div className="flex-1 h-full w-full relative bg-[#eef1f4]">
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
           <Map
