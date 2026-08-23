@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Layers, MapPin, Globe, AlertTriangle } from 'lucide-react';
@@ -36,7 +36,6 @@ export default function HotspotMap() {
           <Map
             defaultCenter={{ lat: 28.6139, lng: 77.2090 }}
             defaultZoom={4.5}
-            mapId="DEMO_MAP_ID"
             disableDefaultUI={true}
             zoomControl={true}
             >
@@ -45,24 +44,11 @@ export default function HotspotMap() {
                 const isCritical = r.severity?.toLowerCase() === 'high' || r.severity?.toLowerCase() === 'critical';
                 
                 return (
-                  <AdvancedMarker 
+                  <Marker 
                     key={i}
                     position={{ lat: r.latitude, lng: r.longitude }}
                     onClick={() => setSelectedReport(r)}
-                  >
-                    <div className="relative flex items-center justify-center">
-                      {isCritical && (
-                        <div 
-                          className="absolute w-8 h-8 rounded-full animate-ping opacity-75"
-                          style={{ backgroundColor: color }}
-                        />
-                      )}
-                      <div 
-                        className="relative z-10 w-4 h-4 rounded-full border-2 border-white shadow-md transition-transform hover:scale-125"
-                        style={{ backgroundColor: color }}
-                      />
-                    </div>
-                  </AdvancedMarker>
+                  />
                 );
               })}
             </Map>

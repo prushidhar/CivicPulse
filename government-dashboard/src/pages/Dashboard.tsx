@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Activity, AlertTriangle, FileCheck, Target, MessageSquare, Bot, Clock, Zap, Map, ShieldCheck, CheckCircle2, Search, ArrowUpRight } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
-import { APIProvider, Map as GoogleMap, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map as GoogleMap, Marker } from '@vis.gl/react-google-maps';
 
 const CountUp = ({ end, duration = 1500, suffix = "" }: { end: number, duration?: number, suffix?: string }) => {
   const [count, setCount] = useState(0);
@@ -188,26 +188,11 @@ export default function Dashboard() {
               <GoogleMap
                 defaultCenter={{ lat: 21.1458, lng: 79.0882 }}
                 defaultZoom={5}
-                mapId="DEMO_GOV_MAP"
                 style={{ width: "100%", height: "100%" }} disableDefaultUI={true}
               >
                 {stats.recentRequests && stats.recentRequests.map((r: any, i: number) => (
                   r.latitude && r.longitude && (
-                    <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
-                      <div className="relative flex items-center justify-center">
-                        <div className="absolute w-8 h-8 rounded-full animate-ping opacity-50" style={{
-                          backgroundColor: (r.severity || '').toLowerCase() === 'critical' ? '#ef4444' : (r.severity || '').toLowerCase() === 'high' ? '#f97316' : '#3b82f6'
-                        }}></div>
-                        <div style={{
-                          width: '14px', height: '14px', borderRadius: '50%',
-                          backgroundColor: (r.severity || '').toLowerCase() === 'critical' ? '#ef4444' : (r.severity || '').toLowerCase() === 'high' ? '#f97316' : '#3b82f6',
-                          border: '3px solid white',
-                          boxShadow: '0 0 10px rgba(0,0,0,0.4)',
-                          position: 'relative',
-                          zIndex: 10
-                        }} />
-                      </div>
-                    </AdvancedMarker>
+                    <Marker key={i} position={{ lat: r.latitude, lng: r.longitude }} />
                   )
                 ))}
               </GoogleMap>

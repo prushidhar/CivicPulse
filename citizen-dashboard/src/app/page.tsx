@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { MessageCircle, FileText, Search, ArrowRight, ShieldCheck, HelpCircle, Map as MapIcon, Zap, Globe, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -113,18 +113,11 @@ export default function Home() {
               <Map
                 defaultCenter={{ lat: 21.1458, lng: 79.0882 }}
                 defaultZoom={5}
-                mapId="DEMO_CITIZEN_MAP"
                 disableDefaultUI={true}
+                style={{ width: "100%", height: "100%" }}
               >
                 {liveReports.map((r, i) => (
-                  <AdvancedMarker key={i} position={{ lat: r.latitude, lng: r.longitude }}>
-                    <div style={{
-                      width: '12px', height: '12px', borderRadius: '50%',
-                      backgroundColor: (r.severity || '').toLowerCase() === 'critical' || (r.severity || '').toLowerCase() === 'high' ? '#EA4335' : (r.severity || '').toLowerCase() === 'medium' ? '#FBBC04' : '#4285F4',
-                      border: '2px solid white',
-                      boxShadow: '0 0 8px rgba(0,0,0,0.2)'
-                    }} />
-                  </AdvancedMarker>
+                  <Marker key={i} position={{ lat: r.latitude, lng: r.longitude }} />
                 ))}
               </Map>
             </APIProvider>
