@@ -4,9 +4,12 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Phone, Lock, User, ArrowRight, ShieldCheck, Loader2, CheckCircle2 } from "lucide-react";
 
+import { useLanguage } from "@/lib/LanguageContext";
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const redirectPath = searchParams.get("redirect") || "/report";
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -92,12 +95,12 @@ function LoginContent() {
         </div>
         
         <h1 className="text-4xl font-extrabold text-gray-900 text-center tracking-tight mb-3">
-          Verify Identity
+          {t("verifyIdentity")}
         </h1>
         <p className="text-gray-500 text-center font-medium mb-10 text-lg">
-          {step === 1 && "Enter your phone number to receive a secure code."}
-          {step === 2 && `We sent a code to ${phone}. Enter it below.`}
-          {step === 3 && "Almost done! What should we call you?"}
+          {step === 1 && t("loginStep1")}
+          {step === 2 && t("loginStep2")}
+          {step === 3 && t("loginStep3")}
         </p>
 
         {error && (
@@ -120,7 +123,7 @@ function LoginContent() {
                 type="tel" 
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone Number" 
+                placeholder={t("phoneNumber")} 
                 className="w-full pl-16 pr-6 py-5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-[#4285F4] focus:ring-4 focus:ring-[#4285F4]/10 text-gray-900 font-bold text-lg placeholder:text-gray-400 transition-all" 
                 required
               />
@@ -131,7 +134,7 @@ function LoginContent() {
               className="w-full py-5 bg-[#4285F4] text-white rounded-2xl font-bold text-lg hover:bg-[#4285F4]/90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                <>Send OTP <ArrowRight className="w-6 h-6" /></>
+                <>{t("sendOtp")} <ArrowRight className="w-6 h-6" /></>
               )}
             </button>
           </form>
@@ -145,7 +148,7 @@ function LoginContent() {
                 type="text" 
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="4-digit Code" 
+                placeholder={t("digitCode")} 
                 maxLength={4}
                 className="w-full pl-14 pr-6 py-4 bg-background border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold text-lg text-center tracking-widest placeholder:text-primary/40 transition placeholder:tracking-normal" 
                 required
@@ -157,7 +160,7 @@ function LoginContent() {
               className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                <>Verify Code <ArrowRight className="w-5 h-5" /></>
+                <>{t("verifyCode")} <ArrowRight className="w-5 h-5" /></>
               )}
             </button>
             <button 
@@ -165,7 +168,7 @@ function LoginContent() {
               onClick={() => { setStep(1); setDemoMessage(""); setOtp(""); }}
               className="w-full text-center text-sm font-bold text-primary/60 hover:text-primary transition"
             >
-              Change Phone Number
+              {t("changePhone")}
             </button>
           </form>
         )}
@@ -178,7 +181,7 @@ function LoginContent() {
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Full Name" 
+                placeholder={t("fullName")} 
                 className="w-full pl-14 pr-6 py-4 bg-background border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold text-lg placeholder:text-primary/40 transition" 
                 required
               />
@@ -189,7 +192,7 @@ function LoginContent() {
               className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                <>Complete Verification <CheckCircle2 className="w-5 h-5" /></>
+                <>{t("completeVerify")} <CheckCircle2 className="w-5 h-5" /></>
               )}
             </button>
           </form>
