@@ -6,6 +6,8 @@ Upgraded to Gemini 2.5 Flash with automatic 1.5 Flash fallback.
 import json
 import logging
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import tempfile
 import time
 from typing import Dict, Any
