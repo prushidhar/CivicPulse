@@ -32,7 +32,9 @@ export default function Dashboard() {
       api.getRecommendations().catch(() => []),
       api.getImpact().catch(() => ({ estimatedPopulationReached: 0 })),
       api.getRequests ? api.getRequests().catch(() => []) : Promise.resolve([])
-    ]).then(([hotspots, recommendations, impact, requests]) => {
+    ]).then(([hotspots, recommendations, impact, requestsData]) => {
+      const requests = Array.isArray(requestsData) ? requestsData : (requestsData.items || []);
+      
       const openReqs = requests.filter((r: any) => {
         const s = (r.status || '').toLowerCase();
         return s === 'open' || s === 'pending' || s === 'processing' || s === 'accepted';
