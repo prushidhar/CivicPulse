@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles, LogOut, Hexagon } from 'lucide-react';
+import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles, LogOut, Hexagon, ArrowUpRight } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
