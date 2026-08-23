@@ -29,7 +29,7 @@ def classify_with_gemini(text: str) -> dict:
     """Uses Gemini to extract structured classification from citizen text."""
     _ensure_gemini_configured()
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""You are an AI assistant for a government digital public infrastructure platform in India.
 Analyze the following citizen request and return ONLY a valid JSON object with these exact keys:
 
@@ -96,7 +96,7 @@ def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/web
     tmp_path = None
     uploaded_file = None
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         clean_mime = mime_type.split(";")[0].strip() if mime_type else "audio/webm"
         suffix = _get_suffix_for_mime(clean_mime)
         
@@ -134,7 +134,7 @@ def analyze_media_with_gemini(media_bytes: bytes, mime_type: str = "image/jpeg")
     tmp_path = None
     uploaded_file = None
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         clean_mime_type = mime_type.split(";")[0].strip() if mime_type else "image/jpeg"
         
         # If it's an image, we can just use inline data which is faster

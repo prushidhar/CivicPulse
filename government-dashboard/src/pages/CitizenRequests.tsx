@@ -109,7 +109,7 @@ export default function CitizenRequests() {
           </h1>
           <p className="text-sm text-gray-500 mt-2 font-medium">
             <Brain className="inline-block w-4 h-4 mr-1.5 text-[#4285F4] align-text-bottom" />
-            Analyzed, Translated, and Routed by <span className="font-bold text-gray-800 ml-1">Google Gemini 1.5</span>
+            Analyzed, Translated, and Routed by <span className="font-bold text-gray-800 ml-1">Google Gemini 2.5</span>
           </p>
         </div>
         <div className="flex space-x-3 items-center relative z-10">
