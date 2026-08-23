@@ -108,8 +108,8 @@ export default function Home() {
               <span className="flex items-center gap-1 ml-3"><div className="w-3 h-3 rounded-full bg-[#4285F4]"></div> Logged</span>
             </div>
           </div>
-          <div className="h-[400px] w-full bg-gray-100">
-            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDummyKeyForDevelopmentPurposesOnly'}>
+          <div className="h-[400px] w-full bg-gray-100 relative">
+            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
               <Map
                 defaultCenter={{ lat: 21.1458, lng: 79.0882 }}
                 defaultZoom={5}

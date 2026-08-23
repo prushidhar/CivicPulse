@@ -32,7 +32,7 @@ export default function HotspotMap() {
   return (
     <div className="flex h-full w-full relative">
       <div className="flex-1 h-full w-full relative bg-[#eef1f4]">
-        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDummyKeyForDevelopmentPurposesOnly'}>
+        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
           <Map
             defaultCenter={{ lat: 28.6139, lng: 77.2090 }}
             defaultZoom={4.5}

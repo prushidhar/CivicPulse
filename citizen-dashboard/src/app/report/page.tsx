@@ -347,7 +347,7 @@ export default function ReportPage() {
               <MapPin className="w-4 h-4" /> {t("useMyLocation")}
             </button>
           </div>
-          <div className="relative w-full h-[300px] bg-muted/20 rounded-2xl overflow-hidden border border-border/50">
+          <div className="relative w-full h-[300px] bg-muted/20 rounded-2xl overflow-hidden border border-border/50 relative">
             <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
               <Map
                 style={{ width: "100%", height: "100%" }}
