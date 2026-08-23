@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Smartphone, ArrowRight, Loader2, KeyRound, Lock, Database, Globe, Zap } from 'lucide-react';
+import { ShieldCheck, Smartphone, ArrowRight, Loader2, KeyRound, Lock, Globe, Zap } from 'lucide-react';
 
 export default function Login() {
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAppLoader, setShowAppLoader] = useState(false);
   const [error, setError] = useState('');
+  const [demoMessage, setDemoMessage] = useState('');
   const navigate = useNavigate();
 
   // Force secure state reset when hitting the login page
@@ -24,21 +26,28 @@ export default function Login() {
     }
     setError('');
     setIsLoading(true);
+    
+    // Generate a secure mock OTP for demo purposes
+    const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    setGeneratedOtp(newOtp);
+    
     setTimeout(() => {
       setIsLoading(false);
       setStep(2);
+      setDemoMessage(`[DEMO 2FA] Your Gov Admin Code: ${newOtp}`);
     }, 1000);
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp !== '1234' && otp !== 'admin') {
-      setError('Invalid OTP code. Please use 1234.');
+    if (otp !== generatedOtp && otp !== 'admin') {
+      setError('Invalid OTP code. Please try again.');
       return;
     }
     
     setIsLoading(true);
     setError('');
+    setDemoMessage('');
     
     setTimeout(() => {
       setIsLoading(false);
@@ -89,7 +98,7 @@ export default function Login() {
           </div>
           <span className="text-2xl font-extrabold tracking-tight text-gray-900">CivicPulse <span className="text-[#4285F4]">Gov</span></span>
         </div>
-        <a href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-jq6a.vercel.app"} className="text-sm font-bold text-gray-500 hover:text-[#4285F4] transition-colors">
+        <a href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-seven-olive.vercel.app"} className="text-sm font-bold text-gray-500 hover:text-[#4285F4] transition-colors">
           Citizen Portal &rarr;
         </a>
       </nav>
@@ -157,6 +166,12 @@ export default function Login() {
                 {error}
               </div>
             )}
+            
+            {demoMessage && step === 2 && (
+              <div className="bg-green-50 text-green-700 p-4 rounded-2xl text-sm font-bold text-center mb-6 border border-green-200 animate-in fade-in slide-in-from-top-4 shadow-sm">
+                {demoMessage}
+              </div>
+            )}
 
             {step === 1 ? (
               <form onSubmit={handleSendOtp} className="space-y-6">
@@ -203,6 +218,13 @@ export default function Login() {
                   {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                     <>Verify Identity <ArrowRight className="w-6 h-6" /></>
                   )}
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => { setStep(1); setDemoMessage(""); setOtp(""); }}
+                  className="w-full text-center text-sm font-bold text-gray-400 hover:text-gray-600 transition mt-2 block"
+                >
+                  Change Mobile Number
                 </button>
               </form>
             )}

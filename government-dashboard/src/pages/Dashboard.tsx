@@ -219,7 +219,16 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`w-3 h-3 rounded-full shadow-sm ${(item.severity || '').toLowerCase() === 'critical' ? 'bg-red-500' : (item.severity || '').toLowerCase() === 'high' ? 'bg-orange-500' : 'bg-blue-500'}`}></div>
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{item.category || 'Issue'}</span>
-                      <span className="text-xs font-bold text-gray-400 ml-auto mr-6">Just now</span>
+                      <span className="text-xs font-bold text-gray-400 ml-auto mr-6">
+                        {item.created_at ? (() => {
+                          const diff = Math.floor((new Date().getTime() - new Date(item.created_at).getTime()) / 1000);
+                          if (isNaN(diff) || diff < 0) return 'Just now';
+                          if (diff < 60) return `${diff}s ago`;
+                          if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+                          if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+                          return `${Math.floor(diff / 86400)}d ago`;
+                        })() : 'Just now'}
+                      </span>
                     </div>
                     <p className="text-gray-900 font-bold text-sm pr-8 leading-relaxed line-clamp-2">
                       {item.intent || item.original_text || 'Pending Analysis'}

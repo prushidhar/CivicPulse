@@ -128,12 +128,17 @@ export default function CitizenRequests() {
           </select>
           <button 
             onClick={() => {
+              const escapeCSV = (str: string | undefined | null) => {
+                if (!str) return '""';
+                const s = String(str).replace(/"/g, '""');
+                return `"${s}"`;
+              };
               const csv = [
-                ['Request ID', 'Category', 'Severity', 'Status', 'Department'],
+                ['Request ID', 'Category', 'Severity', 'Status', 'Department'].map(escapeCSV),
                 ...(filteredRequests || []).map(r => [
                   r.request_id, r.category, r.severity, r.status, 
                   r.transcript?.includes('Assigned Department:') ? r.transcript.split('Assigned Department:')[1].split('\n')[0].trim() : 'Unassigned'
-                ])
+                ].map(escapeCSV))
               ].map(e => e.join(',')).join('\n');
               const blob = new Blob([csv], { type: 'text/csv' });
               const url = window.URL.createObjectURL(blob);
@@ -149,8 +154,7 @@ export default function CitizenRequests() {
           <button 
             onClick={async () => {
               const pending = (filteredRequests || []).filter(r => r.status === 'pending');
-              if (pending.length === 0) return console.log('No pending requests to auto-assign.');
-              console.log(`AI is auto-assigning ${pending.length} pending requests based on departmental routing...`);
+              if (pending.length === 0) return;
               for (const p of pending) {
                 await api.updateRequestStatus(p.request_id, 'accepted');
               }
@@ -389,10 +393,10 @@ export default function CitizenRequests() {
                 )}
               </React.Fragment>
             ))}
-            {requests.length === 0 && (
+            {(!filteredRequests || filteredRequests.length === 0) && (
               <tr>
                 <td colSpan={7} className="px-6 py-8 text-center text-muted-foreground">
-                  No live citizen requests found in the database.
+                  No citizen requests match your search criteria.
                 </td>
               </tr>
             )}

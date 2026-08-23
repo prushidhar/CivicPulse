@@ -47,7 +47,7 @@ export default function TrackPage() {
     } else if (s === 'resolved') {
       states = ['completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed'];
     } else if (s === 'rejected') {
-      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'upcoming', 'upcoming'];
+      states = ['completed', 'completed', 'completed', 'completed', 'completed', 'skipped', 'skipped'];
     }
     
     return [
@@ -56,8 +56,10 @@ export default function TrackPage() {
       { label: 'Location Verified', status: states[2] },
       { label: 'Government Review', status: states[3] },
       { label: s === 'rejected' ? 'Decision (Rejected)' : 'Decision', status: states[4] },
-      { label: 'Implementation', status: states[5] },
-      { label: 'Completed', status: states[6] },
+      ...(s !== 'rejected' ? [
+        { label: 'Implementation', status: states[5] },
+        { label: 'Completed', status: states[6] }
+      ] : [])
     ];
   };
 

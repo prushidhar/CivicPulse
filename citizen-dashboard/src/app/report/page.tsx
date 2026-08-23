@@ -5,7 +5,7 @@ import { Mic, MapPin, CheckCircle2, Loader2, ArrowRight, Square } from "lucide-r
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useRouter } from "next/navigation";
-import maplibregl from "maplibre-gl";
+
 import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 export default function ReportPage() {

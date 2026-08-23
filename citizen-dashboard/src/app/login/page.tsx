@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Phone, Lock, User, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Phone, Lock, User, ArrowRight, ShieldCheck, Loader2, CheckCircle2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/report";
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [demoMessage, setDemoMessage] = useState("");
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,20 +26,28 @@ export default function LoginPage() {
     }
     setLoading(true);
     setError("");
+    
+    // Generate a random 4-digit OTP for demo purposes
+    const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    setGeneratedOtp(newOtp);
+    
     setTimeout(() => {
       setLoading(false);
       setStep(2);
+      // Simulate an SMS by showing an alert/message in the UI
+      setDemoMessage(`[DEMO SMS] Your CivicPulse verification code is: ${newOtp}`);
     }, 800);
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp !== "1234") {
-      setError("Invalid OTP. Try 1234.");
+    if (otp !== generatedOtp) {
+      setError("Invalid OTP. Please try again.");
       return;
     }
     setLoading(true);
     setError("");
+    setDemoMessage("");
     setTimeout(() => {
       setLoading(false);
       setStep(3);
@@ -61,7 +74,7 @@ export default function LoginPage() {
     
     setLoading(true);
     setTimeout(() => {
-      router.push("/report");
+      router.push(redirectPath);
     }, 600);
   };
 
@@ -90,6 +103,12 @@ export default function LoginPage() {
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold text-center mb-6 border border-red-100">
             {error}
+          </div>
+        )}
+
+        {demoMessage && step === 2 && (
+          <div className="bg-blue-50 text-blue-700 p-4 rounded-2xl text-sm font-bold text-center mb-6 border border-blue-200 animate-in fade-in slide-in-from-top-4 shadow-sm">
+            {demoMessage}
           </div>
         )}
 
@@ -126,7 +145,7 @@ export default function LoginPage() {
                 type="text" 
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="4-digit Code (e.g. 1234)" 
+                placeholder="4-digit Code" 
                 maxLength={4}
                 className="w-full pl-14 pr-6 py-4 bg-background border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 text-primary font-bold text-lg text-center tracking-widest placeholder:text-primary/40 transition placeholder:tracking-normal" 
                 required
@@ -143,7 +162,7 @@ export default function LoginPage() {
             </button>
             <button 
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => { setStep(1); setDemoMessage(""); setOtp(""); }}
               className="w-full text-center text-sm font-bold text-primary/60 hover:text-primary transition"
             >
               Change Phone Number
@@ -170,7 +189,7 @@ export default function LoginPage() {
               className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                <>Complete Verification <CheckCircle className="w-5 h-5" /></>
+                <>Complete Verification <CheckCircle2 className="w-5 h-5" /></>
               )}
             </button>
           </form>
@@ -180,23 +199,10 @@ export default function LoginPage() {
   );
 }
 
-// Add this missing icon since we use it above
-function CheckCircle(props: any) {
+export default function LoginPage() {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
