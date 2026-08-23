@@ -30,7 +30,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/5">
+    <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/logo.jpg" alt="CivicPulse Logo" className="h-10 md:h-12 object-contain" />

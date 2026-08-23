@@ -153,7 +153,7 @@ export default function Shell() {
               Citizen Portal <ArrowUpRight className="w-4 h-4" />
             </a>
             <button 
-              onClick={() => alert("3 new AI recommendations require review.")}
+              onClick={() => navigate('/recommendations')}
               className="relative p-3 text-gray-500 bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 rounded-2xl transition-all"
             >
               <Bell className="w-5 h-5" />

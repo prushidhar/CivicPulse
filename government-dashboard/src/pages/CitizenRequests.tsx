@@ -149,8 +149,8 @@ export default function CitizenRequests() {
           <button 
             onClick={async () => {
               const pending = (filteredRequests || []).filter(r => r.status === 'pending');
-              if (pending.length === 0) return alert('No pending requests to auto-assign.');
-              alert(`AI is auto-assigning ${pending.length} pending requests based on departmental routing...`);
+              if (pending.length === 0) return console.log('No pending requests to auto-assign.');
+              console.log(`AI is auto-assigning ${pending.length} pending requests based on departmental routing...`);
               for (const p of pending) {
                 await api.updateRequestStatus(p.request_id, 'accepted');
               }
@@ -164,7 +164,7 @@ export default function CitizenRequests() {
           
           {/* Feature #26: Manual Merge Button */}
           <button 
-            onClick={() => alert("Merge Duplicates workflow would open here. (Admin privileges required)")}
+            onClick={() => console.log("Merge Duplicates workflow would open here.")}
             className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors flex items-center shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-[#FBBC04]"><path d="M16 3h5v5"/><path d="m21 3-5 5"/><path d="M21 21H3"/><path d="m15 16-3 5-3-5"/></svg>

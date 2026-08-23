@@ -59,7 +59,7 @@ export default function Recommendations() {
   const handleDecision = async (decision: 'accepted' | 'rejected' | 'edited') => {
     if (!selectedRec) return;
     if (!decisionReason && decision !== 'edited') {
-      alert("Please provide a reason for this decision.");
+      console.warn("Please provide a reason for this decision.");
       return;
     }
     await api.decideRecommendation(selectedRec.id, decision, decisionReason || 'Edited recommendation terms.');
