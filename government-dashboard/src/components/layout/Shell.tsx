@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, Sparkles, LogOut, Hexagon, ArrowUpRight } from 'lucide-react';
+import { LayoutDashboard, Map, MessageSquare, AlertCircle, HardDrive, FileText, Menu, X, Bell, Search, UserCircle, LogOut, ArrowUpRight } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -142,7 +142,7 @@ export default function Shell() {
               <span className="text-sm font-mono font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-md">{clock}</span>
             </div>
             <a 
-              href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-citizen.vercel.app"} 
+              href={import.meta.env.VITE_CITIZEN_URL || "https://civic-pulse-seven-olive.vercel.app"} 
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex text-sm font-extrabold text-blue-600 hover:text-indigo-600 transition-colors gap-1 items-center"

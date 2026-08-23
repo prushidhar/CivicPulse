@@ -2,7 +2,6 @@ import logging
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.models import CitizenRequest
-from app.ai.classification.mock_classifier import classify_text
 from app.ai.ner.mock_ner import extract_entities
 from app.services.geocoding_service import geocode_entities
 from app.services.deduplication_service import find_duplicate_cluster

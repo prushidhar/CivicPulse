@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Layers, MapPin, Globe, AlertTriangle } from 'lucide-react';
@@ -39,18 +39,13 @@ export default function HotspotMap() {
             disableDefaultUI={true}
             zoomControl={true}
             >
-              {showPoints && requests.map((r, i) => {
-                const color = getColor(r.severity);
-                const isCritical = r.severity?.toLowerCase() === 'high' || r.severity?.toLowerCase() === 'critical';
-                
-                return (
-                  <Marker 
-                    key={i}
-                    position={{ lat: r.latitude, lng: r.longitude }}
-                    onClick={() => setSelectedReport(r)}
-                  />
-                );
-              })}
+              {showPoints && requests.map((r) => (
+                <Marker 
+                  key={r.request_id || `${r.latitude}-${r.longitude}`}
+                  position={{ lat: r.latitude, lng: r.longitude }}
+                  onClick={() => setSelectedReport(r)}
+                />
+              ))}
             </Map>
         </APIProvider>
         

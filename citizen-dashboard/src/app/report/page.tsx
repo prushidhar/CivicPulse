@@ -350,6 +350,7 @@ export default function ReportPage() {
           <div className="relative w-full h-[300px] bg-muted/20 rounded-2xl overflow-hidden border border-border/50">
             <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
               <Map
+                key={`${mapLat.toFixed(4)}-${mapLng.toFixed(4)}`}
                 style={{ width: "100%", height: "100%" }}
                 defaultCenter={{ lat: mapLat, lng: mapLng }}
                 defaultZoom={12}

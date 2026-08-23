@@ -76,6 +76,9 @@ export interface CitizenRequest {
   ai_confidence?: number;
   created_at: string;
   citizen_name?: string;
+  citizen_phone?: string;
+  latitude?: number;
+  longitude?: number;
   media?: { url: string; type: string }[];
 };
 

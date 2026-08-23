@@ -4,17 +4,19 @@ import { api, type Recommendation, type Evidence } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, XCircle, AlertCircle } from 'lucide-react';
 
 export default function Recommendations() {
   const context = useOutletContext<{ globalSearch: string }>();
   const globalSearch = context?.globalSearch || '';
 
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  // Fix: initialize as null so the loading skeleton actually shows
+  const [recommendations, setRecommendations] = useState<Recommendation[] | null>(null);
   const [selectedRec, setSelectedRec] = useState<Recommendation | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [decisionReason, setDecisionReason] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [decisionError, setDecisionError] = useState<string | null>(null);
 
   const fetchRecs = () => {
     api.getRecommendations()
@@ -31,7 +33,7 @@ export default function Recommendations() {
       });
   };
 
-  const filteredRecs = recommendations.filter(r => {
+  const filteredRecs = (recommendations || []).filter(r => {
     if (!globalSearch.trim()) return true;
     const s = globalSearch.toLowerCase();
     return (
@@ -58,10 +60,12 @@ export default function Recommendations() {
 
   const handleDecision = async (decision: 'accepted' | 'rejected' | 'edited') => {
     if (!selectedRec) return;
+    // Show UI error instead of silent console.warn
     if (!decisionReason && decision !== 'edited') {
-      console.warn("Please provide a reason for this decision.");
+      setDecisionError("Please provide a mandatory decision rationale before submitting.");
       return;
     }
+    setDecisionError(null);
     await api.decideRecommendation(selectedRec.id, decision, decisionReason || 'Edited recommendation terms.');
     setDecisionReason('');
     const updated = await api.getRecommendations();
@@ -70,7 +74,8 @@ export default function Recommendations() {
     if (newSelected) setSelectedRec(newSelected);
   };
 
-  if (!recommendations) {
+  // Show loading skeleton while null (initial load)
+  if (recommendations === null) {
     return (
       <div className="flex h-full w-full animate-pulse">
         <div className="w-1/3 border-r border-border bg-muted/20 p-6 space-y-4">
@@ -103,7 +108,20 @@ export default function Recommendations() {
           <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 relative z-10">Priority Engine</h2>
           <p className="text-sm text-gray-500 font-medium relative z-10">AI-generated intervention proposals</p>
         </div>
+
+        {error && (
+          <div className="m-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
+
         <div className="p-4 space-y-3">
+          {filteredRecs.length === 0 && !error && (
+            <div className="text-center py-12 text-muted-foreground text-sm">
+              No recommendations yet. Submit civic reports to generate AI priority scores.
+            </div>
+          )}
           {filteredRecs.map(rec => (
             <div 
               key={rec.id} 
@@ -167,10 +185,11 @@ export default function Recommendations() {
                   <CardContent className="space-y-4">
                     <div className="bg-blue-500/10 text-blue-700 dark:text-blue-400 p-3 rounded-md border border-blue-500/20 flex items-start text-sm">
                       <Info className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-                      <p>Recommendation generated due to intersecting high citizen demand (452 reports) and existing poor infrastructure condition.</p>
+                      <p>Recommendation generated due to intersecting high citizen demand and existing poor infrastructure condition.</p>
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Evidence Sources</h4>
+                      {/* Fix: use ul>li for valid HTML */}
                       <ul className="space-y-2">
                         {Array.isArray(evidence) ? evidence.map((e: any, i) => (
                           <li key={e.id || i} className="text-sm border-l-2 border-primary pl-3 py-1">
@@ -178,14 +197,12 @@ export default function Recommendations() {
                             {e.confidence && <span className="ml-2 text-xs text-green-600 font-medium">({(e.confidence * 100).toFixed(0)}% conf)</span>}
                           </li>
                         )) : (
-                          <div className="space-y-2">
-                            {Object.entries(evidence).map(([key, val], i) => (
-                               <li key={i} className="text-sm border-l-2 border-primary pl-3 py-1">
-                                 <span className="font-medium text-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
-                                 <pre className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">{typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)}</pre>
-                               </li>
-                            ))}
-                          </div>
+                          Object.entries(evidence as any).map(([key, val], i) => (
+                            <li key={i} className="text-sm border-l-2 border-primary pl-3 py-1">
+                              <span className="font-medium text-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
+                              <pre className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">{typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)}</pre>
+                            </li>
+                          ))
                         )}
                       </ul>
                     </div>
@@ -201,11 +218,18 @@ export default function Recommendations() {
                   <CardTitle>Human Review Action</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Fix: Show validation error in UI, not just console */}
+                  {decisionError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {decisionError}
+                    </div>
+                  )}
                   <textarea 
                     className="w-full bg-background border border-input rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-4 min-h-[100px]"
                     placeholder="Mandatory decision rationale..."
                     value={decisionReason}
-                    onChange={e => setDecisionReason(e.target.value)}
+                    onChange={e => { setDecisionReason(e.target.value); setDecisionError(null); }}
                   />
                   <div className="flex space-x-3">
                     <Button onClick={() => handleDecision('accepted')} className="bg-green-600 hover:bg-green-700 text-white">
