@@ -169,14 +169,6 @@ export default function HotspotMap() {
                     <label className="text-sm font-medium cursor-pointer">Citizen Report Points</label>
                     <input type="checkbox" checked={showPoints} readOnly className="w-4 h-4 rounded text-primary focus:ring-primary" />
                   </div>
-                  <div className="flex items-center justify-between opacity-50 cursor-not-allowed">
-                    <label className="text-sm font-medium cursor-not-allowed">IoT Sensor Data (Beta)</label>
-                    <input type="checkbox" disabled className="w-4 h-4 rounded" />
-                  </div>
-                  <div className="flex items-center justify-between opacity-50 cursor-not-allowed">
-                    <label className="text-sm font-medium cursor-not-allowed">Live Traffic Alerts</label>
-                    <input type="checkbox" disabled className="w-4 h-4 rounded" />
-                  </div>
                 </div>
               </div>
 

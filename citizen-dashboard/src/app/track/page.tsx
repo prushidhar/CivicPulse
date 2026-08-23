@@ -259,7 +259,18 @@ export default function TrackPage() {
                 </div>
               </div>
               <button 
-                onClick={() => alert("Social sharing API would open here! (Hackathon Demo)")}
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'CivicPulse Impact',
+                      text: `I just resolved a civic issue in my community using CivicPulse! Issue ID: ${trackData.request_id}`,
+                      url: window.location.href,
+                    }).catch(console.error);
+                  } else {
+                    navigator.clipboard.writeText(`I just resolved a civic issue using CivicPulse! Issue ID: ${trackData.request_id}`);
+                    alert("Impact message copied to clipboard!");
+                  }
+                }}
                 className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold rounded-2xl shadow-md hover:shadow-lg border border-gray-200 transition-all flex items-center gap-3 shrink-0 relative z-10"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#4285F4]"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>

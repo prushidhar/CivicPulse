@@ -166,13 +166,19 @@ export default function CitizenRequests() {
             <Zap className="w-4 h-4 mr-2" /> Auto-Assign AI
           </button>
           
-          {/* Feature #26: Manual Merge Button */}
           <button 
-            onClick={() => console.log("Merge Duplicates workflow would open here.")}
+            onClick={() => {
+              const btn = document.getElementById('refresh-btn-icon');
+              if (btn) btn.classList.add('animate-spin');
+              fetchRequests();
+              setTimeout(() => {
+                if (btn) btn.classList.remove('animate-spin');
+              }, 1000);
+            }}
             className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors flex items-center shadow-sm"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-[#FBBC04]"><path d="M16 3h5v5"/><path d="m21 3-5 5"/><path d="M21 21H3"/><path d="m15 16-3 5-3-5"/></svg>
-            Merge Duplicates
+            <svg id="refresh-btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-blue-500"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
+            Refresh Data
           </button>
         </div>
       </div>
