@@ -9,6 +9,24 @@ export default function HotspotMap() {
   const [requests, setRequests] = useState<any[]>([]);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [showPoints, setShowPoints] = useState(true);
+  const [filter, setFilter] = useState<string | null>(null);
+
+  const filteredRequests = useMemo(() => {
+    if (!filter) return requests;
+    if (filter === 'critical') return requests.filter(r => (r.severity || '').toLowerCase() === 'critical');
+    if (filter === '24h') {
+      const now = new Date();
+      return requests.filter(r => r.created_at && (now.getTime() - new Date(r.created_at).getTime() < 86400000));
+    }
+    if (filter === 'roads') return requests.filter(r => {
+      const cat = (r.category || '').toLowerCase();
+      const desc = (r.description || '').toLowerCase();
+      const txt = (r.original_text || '').toLowerCase();
+      return cat.includes('road') || cat.includes('pothole') || desc.includes('road') || txt.includes('road');
+    });
+    if (filter === 'unassigned') return requests.filter(r => (r.status || '').toLowerCase() === 'pending');
+    return requests;
+  }, [requests, filter]);
 
   useEffect(() => {
     api.getRequests().then(data => {
@@ -40,7 +58,7 @@ export default function HotspotMap() {
             disableDefaultUI={true}
             zoomControl={true}
           >
-              {showPoints && requests.map((r) => (
+              {showPoints && filteredRequests.map((r) => (
                 <Marker 
                   key={r.request_id || `${r.latitude}-${r.longitude}`}
                   position={{ lat: r.latitude, lng: r.longitude }}
@@ -150,10 +168,10 @@ export default function HotspotMap() {
               <div className="space-y-4">
                 <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Quick Filters</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <button className="text-xs py-2 bg-destructive/10 text-destructive font-bold rounded-md border border-destructive/20 hover:bg-destructive/20 transition">Critical Only</button>
-                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Last 24 Hours</button>
-                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Road Hazards</button>
-                  <button className="text-xs py-2 bg-white border border-border font-bold rounded-md text-muted-foreground hover:bg-muted transition">Unassigned</button>
+                  <button onClick={() => setFilter(filter === 'critical' ? null : 'critical')} className={`text-xs py-2 font-bold rounded-md border transition ${filter === 'critical' ? 'bg-destructive text-white border-destructive' : 'bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20'}`}>Critical Only</button>
+                  <button onClick={() => setFilter(filter === '24h' ? null : '24h')} className={`text-xs py-2 font-bold rounded-md border transition ${filter === '24h' ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:bg-muted'}`}>Last 24 Hours</button>
+                  <button onClick={() => setFilter(filter === 'roads' ? null : 'roads')} className={`text-xs py-2 font-bold rounded-md border transition ${filter === 'roads' ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:bg-muted'}`}>Road Hazards</button>
+                  <button onClick={() => setFilter(filter === 'unassigned' ? null : 'unassigned')} className={`text-xs py-2 font-bold rounded-md border transition ${filter === 'unassigned' ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:bg-muted'}`}>Unassigned</button>
                 </div>
               </div>
             </div>

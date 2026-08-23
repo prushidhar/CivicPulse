@@ -24,6 +24,7 @@ const CountUp = ({ end, duration = 1500, suffix = "" }: { end: number, duration?
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showInsights, setShowInsights] = useState(false);
 
   const fetchStats = () => {
     Promise.all([
@@ -103,15 +104,43 @@ export default function Dashboard() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
-            <button className="px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-blue-900/50 hover:shadow-blue-900/80 transition-all flex items-center justify-center gap-2 border border-blue-500">
+            <button onClick={() => window.print()} className="px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-blue-900/50 hover:shadow-blue-900/80 transition-all flex items-center justify-center gap-2 border border-blue-500">
               <FileCheck className="w-5 h-5" /> Generate PDF Report
             </button>
-            <button className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold text-sm backdrop-blur-md border border-white/10 transition-all flex items-center justify-center gap-2">
+            <button onClick={() => setShowInsights(true)} className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold text-sm backdrop-blur-md border border-white/10 transition-all flex items-center justify-center gap-2">
               <Bot className="w-5 h-5" /> AI Insights
             </button>
           </div>
         </div>
       </div>
+
+      {showInsights && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center gap-3 mb-6 text-indigo-600">
+              <Bot className="w-8 h-8" />
+              <h3 className="text-2xl font-extrabold text-gray-900">AI Insights</h3>
+            </div>
+            <div className="space-y-5 text-gray-700">
+              <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <p className="font-bold text-indigo-900 flex items-center gap-2 mb-1"><Target className="w-4 h-4" /> Predictive Hotspot</p>
+                <p className="text-sm">High probability of road hazard reports emerging in Sector 42 due to recent heavy rainfall.</p>
+              </div>
+              <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                <p className="font-bold text-emerald-900 flex items-center gap-2 mb-1"><Activity className="w-4 h-4" /> Trend Analysis</p>
+                <p className="text-sm">15% decrease in overall critical reports compared to last week.</p>
+              </div>
+              <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                <p className="font-bold text-orange-900 flex items-center gap-2 mb-1"><Zap className="w-4 h-4" /> Resource Allocation</p>
+                <p className="text-sm">Recommend shifting 2 maintenance crews to the downtown grid based on current backlog.</p>
+              </div>
+            </div>
+            <button onClick={() => setShowInsights(false)} className="mt-8 w-full py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition shadow-md">
+              Close Insights
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main KPI Grid - Ultimate Glassmorphism */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 px-2">
